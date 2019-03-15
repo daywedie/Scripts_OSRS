@@ -14,7 +14,7 @@ import org.dreambot.api.methods.map.Tile;
  */
 public class Constants {
     
-         public static int food = 379; //Food to take from bank || 385 = Shark, 379 = Lobster
+         public static int food = 385; //Food to take from bank || 385 = Shark, 379 = Lobster
         //public static int food_amount = 5; //Amout of food to take from bank
          public static int stamina = 343;
          public static Tile BASKET_LOCATION = new Tile(3351, 2961, 0);

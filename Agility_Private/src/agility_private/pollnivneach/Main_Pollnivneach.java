@@ -153,7 +153,8 @@ public void onMessage(Message msg) {
                         basket.interactForceRight("Climb-on");
                         entered = true;
                     } else {
-                        getWalking().walk(Constants.BASKET_LOCATION);
+                        getWalking().walkExact(Constants.BASKET_LOCATION);
+                        sleepUntil(() -> basket.isOnScreen(), 4000);
                     }
                 break;
                 case ROOFS:
@@ -163,12 +164,14 @@ public void onMessage(Message msg) {
                           sleepUntil(() -> inArea(Constants.SECOND_ROOF), 5000);
                     }
                     if (inArea(Constants.SECOND_ROOF)) {
-                        sleep(600);
-                        getWalking().walk(new Tile(3354, 2976, 1));
+                        //sleep(550, 600);
+                        getWalking().walk(new Tile(3354, 2975, 1));
                         GameObject banner = getGameObjects().closest(11382);
-                        banner.interact();
+                        if (banner.isOnScreen()) {
+                        //GameObject banner = getGameObjects().getTopObjectOnTile(new Tile(3356, 2978, 1));
+                        banner.interactForceRight("Grab");
                         sleepUntil(() -> inArea(Constants.THIRD_ROOF), 3000);
-                    }
+                    }}
                     if (inArea(Constants.THIRD_ROOF)) {
                         GameObject gap = getGameObjects().closest(11383);
                         gap.interact();
@@ -182,7 +185,7 @@ public void onMessage(Message msg) {
                     if (inArea(Constants.FIFTH_ROOF)) {
                         GameObject wall = getGameObjects().closest(11385);
                         wall.interact();
-                        sleepUntil(() -> inArea(Constants.SIXTH_ROOF), 3000);
+                        sleepUntil(() -> inArea(Constants.SIXTH_ROOF), 5000);
                     }
                     if (inArea(Constants.SIXTH_ROOF)) {
                         GameObject bars = getGameObjects().closest(11386);
@@ -206,7 +209,7 @@ public void onMessage(Message msg) {
             }
     
     ///////////////////////////////////////////////////////////
-		return Calculations.random(466, 676);
+		return Calculations.random(466, 676); //466, 676
         }
 
 @Override

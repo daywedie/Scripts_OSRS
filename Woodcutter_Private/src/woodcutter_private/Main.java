@@ -54,7 +54,7 @@ public boolean banking = false;
 	};
         
         private State getState() {
-              if (getInventory().count(Constants.oak_logs) > new Random().nextInt(6 + 1) + 10 || getInventory().isFull()) {       
+              if (getInventory().count(Constants.teak_logs) > new Random().nextInt(6 + 1) + 10 || getInventory().isFull()) {       
                   return State.DROP;
         } else {
                   return State.CUT;
@@ -64,16 +64,17 @@ public boolean banking = false;
     public int onLoop() {
         switch (getState()) {
             case DROP:
-            getInventory().dropAll(Constants.oak_logs); 
+            getInventory().dropAll(Constants.teak_logs); 
              break;
             case CUT:
             GameObject tree = getGameObjects().closest(Constants.tree);
-            tree.getRealID();
-            if (tree != null) { 
-            tree.interactForceRight("Chop down");
+            if (tree.isOnScreen()) {
+            if (tree.interact()) { 
+            //tree.interactForceRight("Chop down");
             sleep(3000, 4000);
             sleepUntil(() -> !getLocalPlayer().isAnimating(), 15000); 
-            }
+          // sleepUntil(() -> tree == null, 15000); 
+            }}
             break;
         }
        return Calculations.random(0, 0);

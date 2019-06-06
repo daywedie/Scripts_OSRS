@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package wintertodt_private;
+package wintertodt_beta;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -22,6 +22,7 @@ import org.dreambot.api.utilities.Timer;
 import org.dreambot.api.wrappers.interactive.GameObject;
 import org.dreambot.api.wrappers.items.Item;
 import org.dreambot.api.wrappers.widgets.message.Message;
+import wintertodt_beta.Constants;
 import wintertodt_private.utils.PricedItem;
 
 @ScriptManifest(author = "T7emon", name = "Wintertodt_Beta", version = 1.0, description = "Wintertodt Beta", category = Category.MINIGAME)
@@ -71,18 +72,18 @@ public class Main_Beta extends AbstractScript {
           GameObject bank = getGameObjects().closest(gameObject -> gameObject != null && gameObject.hasAction("Bank"));
           bank.interactForceRight("Bank");
           log("STATUS = BANK");
-           sleepUntil(() -> getBank().open(), 5000);
+           sleepUntil(() -> getBank().open(), Calculations.random(4500, 5000));
           //sleep(Calculations.random(2176, 2347));
           //getBank().depositAllExcept(Constants.KNIFE);
    
           if(getBank().isOpen()) {
-          sleep(900);
-          getBank().depositAllExcept(item -> item != null && item.getName().equals("Tinderbox") || item.getName().equals("Dragon axe") || item.getName().equals("Knife"));
+          sleep(Calculations.random(800, 950));
+          getBank().depositAllExcept(item -> item != null && item.getName().equals("Tinderbox") || item.getName().toLowerCase().endsWith("axe") || item.getName().equals("Knife"));
           //getBank().depositAllExcept(item -> item != null && item.getName().toLowerCase().contains("tinderbox") && item.getName().toLowerCase().contains("axe") && item.getName().toLowerCase().contains("knife"));
           //sleep(Calculations.random(1100, 1230));
           sleepUntil(() -> getInventory().emptySlotCount() == 25, 5000);
           getBank().withdraw(Constants.food, Constants.food_amount);
-          sleep(Calculations.random(1400, 1900));
+          sleep(Calculations.random(1390, 1895));
           }
           if (getInventory().count(Constants.food) == Constants.food_amount) {
           getBank().close();
@@ -93,6 +94,13 @@ public class Main_Beta extends AbstractScript {
     */
 @Override
 public void onMessage(Message msg) {
+    	if (msg.getMessage().contains("You have helped enough to earn a supply crate.")) {
+            //Constants.roots_amount = 10;
+            //Constants.kindling_amount = 10;
+            //log("STATUS = FLETCH");
+            //fletching = true;
+        }
+        
 	if (msg.getMessage().contains("Your inventory is too full to hold any more roots.")) {
             //log("STATUS = FLETCH");
             //fletching = true;
@@ -125,11 +133,12 @@ public void onMessage(Message msg) {
             log("STATUS = ENTER");
         getWalking().walk(Constants.DOOR_LOCATION.getRandomizedTile());
             GameObject door = getGameObjects().closest(gameObject -> gameObject != null && gameObject.hasAction("Enter"));
-                    sleepUntil(() -> door.isOnScreen(), 3500);
+                    sleepUntil(() -> door.isOnScreen(), Calculations.random(3470, 3530));
     if(door.interact()){
-                            sleep(Calculations.random(3000, 3500));
-                           getWalking().walk(Constants.TREE_LOCATION.getRandomizedTile()); //WALK TO TREE
-                            sleep(Calculations.random(3000, 3200));
+     sleepUntil(() -> inArea(Constants.Wintertodt), Calculations.random(900, 1100));
+                            sleep(Calculations.random(2534, 3046));
+                            getWalking().walk(Constants.TREE_LOCATION.getRandomizedTile()); //WALK TO TREE
+                            sleep(Calculations.random(2951, 3258));
                             if (inArea(Constants.Wintertodt)) {
                             log("Entered Wintertodt Area");
         }}}
@@ -141,9 +150,9 @@ public void onMessage(Message msg) {
             sleep(Calculations.random(980, 1320));
         getWalking().walk(Constants.LEAVE_LOCATION.getRandomizedTile());
             GameObject door = getGameObjects().closest(gameObject -> gameObject != null && gameObject.hasAction("Enter"));
-    sleepUntil(() -> door.isOnScreen(), 3500);
+    sleepUntil(() -> door.isOnScreen(), Calculations.random(3509, 3544));
     if(door.interact()){
-    sleepUntil(() -> !inArea(Constants.Wintertodt), 5000);
+    sleepUntil(() -> !inArea(Constants.Wintertodt), Calculations.random(4998, 5119)); //5000
     if (!inArea(Constants.Wintertodt)) {
         log("Succesfully left Wintertodt Area");
     }
@@ -157,7 +166,7 @@ public void onMessage(Message msg) {
                 GameObject tree = getGameObjects().closest(gameObject -> gameObject != null && gameObject.hasAction("Chop"));
                 if(tree.interact()){
                     log("STATUS = CUTTING");
-                    sleepUntil(() -> !getLocalPlayer().isAnimating(), 14000);
+                    sleepUntil(() -> !getLocalPlayer().isAnimating(), Calculations.random(13900, 13950));
                  //sleep(Calculations.random(4000, 5000));
                   }
     }}
@@ -166,9 +175,9 @@ public void onMessage(Message msg) {
     */
     private void fletch() {
         getInventory().get(Constants.knife).useOn(Constants.roots);
-            sleep(Calculations.random(3500, 4000));
+            sleep(Calculations.random(3502, 4008));
             log("STATUS = FLETCHING");
-         sleepUntil(() -> !getLocalPlayer().isAnimating(), 12000);
+         sleepUntil(() -> !getLocalPlayer().isAnimating(), Calculations.random(12040, 13011));
     }
     
 @Override
@@ -184,15 +193,15 @@ public void onMessage(Message msg) {
 	};
 
 	private State getState() {
-             if (getSkills().getExperience(Skill.FIREMAKING) >= 13000000) {
-                 leaveWintertodt();
-                   sleep(Calculations.random(4500, 5000));
-                    this.stop();
-             }
+             //if (getSkills().getExperience(Skill.FIREMAKING) >= 13000000) {
+              //   leaveWintertodt();
+                 //  sleep(Calculations.random(4500, 5000));
+                 //   this.stop();
+            // }
            /*
             * Make Sure we dont die..
             */
-            if (!getInventory().contains(Constants.food) && inArea(Constants.Wintertodt) && (getSkills().getBoostedLevels(Skill.HITPOINTS) < 30)) {
+            if (!getInventory().contains(Constants.food) && inArea(Constants.Wintertodt) && (getSkills().getBoostedLevels(Skill.HITPOINTS) <= 2)) {
                 leaveWintertodt();
                    sleep(Calculations.random(4500, 5000));
                     this.stop();
@@ -201,8 +210,8 @@ public void onMessage(Message msg) {
            /*
             * Eat food here..
             */
-            if (getSkills().getBoostedLevels(Skill.HITPOINTS) < 40) {
-                getInventory().interact(item -> item != null && item.getName().contains("Shark"), "Eat");
+            if (getSkills().getBoostedLevels(Skill.HITPOINTS) <= 4) {
+                getInventory().interact(item -> item != null && item.getName().contains("Tuna"), "Eat"); //Shark
                 //if (cutting) {
                     //return State.CUT;
                 //} 
@@ -243,14 +252,14 @@ public void onMessage(Message msg) {
                 */
            if (inArea(Constants.Wintertodt) && gameStarted) {
                 log("In Area");
-              if (!fletching && !getInventory().contains(Constants.kindling) && getInventory().count(Constants.roots) < Constants.roots_amount) {
+              if (!fletching && !getInventory().contains(Constants.kindling) && getInventory().count(Constants.roots) <= Constants.roots_amount) {
                     cutting = true;
               } else {
-                 if (getInventory().count(Constants.roots) > Constants.roots_amount) { //8
+                 if (getInventory().count(Constants.roots) >= Constants.roots_amount) { //8
                      cutting = false;
                      fletching = true;
                  } else {
-                 if (getInventory().count(Constants.kindling) > Constants.kindling_amount) {
+                 if (getInventory().count(Constants.kindling) >= Constants.kindling_amount) {
                   fletching = false;
                 }}}
                  
@@ -292,14 +301,6 @@ public void onMessage(Message msg) {
       /*****************************************************************************************************************************/
 		switch (getState()) {
                     case BANK:
-                if (getInventory().contains(Constants.rewardbox)) {
-                    winStreak++;
-                    //crate.update();
-                    //sleep(1200);
-                    getInventory().get(Constants.rewardbox).interact("Open");
-                    sleepUntil(() -> !getInventory().contains(Constants.rewardbox), 2000);
-                    //sleep(1500);
-                }
                    bank();
                     break;
                     case ENTER:
@@ -315,22 +316,30 @@ public void onMessage(Message msg) {
                  GameObject brazier = getGameObjects().closest(gameObject -> gameObject != null && gameObject.hasAction("Feed"));
                  if(brazier.interact()){
                      log("Feed brazier");
-                     sleepUntil(() -> !getInventory().contains(Constants.kindling), 5500);
+                     sleepUntil(() -> !getInventory().contains(Constants.kindling), Calculations.random(5300, 5500));
                  GameObject unlitbrazier = getGameObjects().closest(gameObject -> gameObject != null && gameObject.hasAction("Light"));
                  if(unlitbrazier.interact()){
                      log("Light brazier");
-                     sleepUntil(() -> !getLocalPlayer().isAnimating(), 888);
+                     sleepUntil(() -> !getLocalPlayer().isAnimating(), 777);
                  }
                  }
                 break;
                 case LEAVE:
+                if (getInventory().contains(Constants.rewardbox)) {
+                    winStreak++;
+                    //crate.update();
+                    //sleep(1200);
+                    getInventory().get(Constants.rewardbox).interact("Open");
+                    sleepUntil(() -> !getInventory().contains(Constants.rewardbox), Calculations.random(1900, 2100));
+                    //sleep(1500);
+                }
                 leaveWintertodt();
                 break;
                 case SLEEP:
-                   sleep(Calculations.random(277, 399));
+                   sleep(Calculations.random(276, 398));
                  break;
                 }
-		return Calculations.random(250, 450);
+		return Calculations.random(244, 439);
         }
 
 @Override

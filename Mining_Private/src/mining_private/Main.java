@@ -25,7 +25,7 @@ import org.dreambot.api.wrappers.widgets.message.Message;
  *
  * @author t7emon
  */
-@ScriptManifest(author = "T7emon", name = "Mining_Beta", version = 1.0, description = "Mining Beta", category = Category.MINING)
+@ScriptManifest(author = "T7emon", name = "Mining_Private", version = 1.0, description = "Mining Guild Private", category = Category.MINING)
 
 public class Main extends AbstractScript {
     
@@ -96,12 +96,12 @@ public void onMessage(Message msg) {
 	@Override
 	public int onLoop() {
       /*****************************************************************************************************************************/
-		switch (getState()) {
-               case MINE:
+		switch (getState()) {                  
+            /*case MINE:
             GameObject ore1 = getGameObjects().getTopObjectOnTile(new Tile(3028, 9720, 0)); //7455 //7468
             GameObject ore2 = getGameObjects().getTopObjectOnTile(new Tile(3029, 9721, 0)); //7455 
             GameObject ore3 = getGameObjects().getTopObjectOnTile(new Tile(3030, 9720, 0)); //7455
-            if (ore1 != null && ore1.getID() == 7455) {
+            if (ore1 != null && ore1.getID() == 7455) { 
                 ore1.interact();
               sleepUntil(()-> ore1.getID() == 7468, 1200);
               ore_count++;
@@ -118,18 +118,28 @@ public void onMessage(Message msg) {
                     }
                 }}
                 break;
-                 /*   case MINE:
+                */
+            case MINE:
             GameObject ore1 = getGameObjects().getTopObjectOnTile(new Tile(3028, 9720, 0)); //7455 //7468
             GameObject ore2 = getGameObjects().getTopObjectOnTile(new Tile(3029, 9721, 0)); //7455 
             GameObject ore3 = getGameObjects().getTopObjectOnTile(new Tile(3030, 9720, 0)); //7455
-            ore1.interact();
-             sleepUntil(()-> ore1.getID() == 7468, 1670);
-            //sleep(1100);
-            ore2.interact();
-             sleepUntil(()-> ore2.getID() == 7468, 1670);
-            ore3.interact();
-             sleepUntil(()-> ore3.getID() == 7468, 1670);
-                        break;*/
+            if (ore1 != null && ore1.getID() == 11364) { 
+                ore1.interact();
+              sleepUntil(()-> ore1.getID() == 11390, 1200);
+              ore_count++;
+            } else {
+                if (ore1.getID() == 11390 && ore2 != null && ore2.getID() == 11364) {
+                    ore2.interact();
+                   sleepUntil(()-> ore2.getID() == 11390, 1200);
+                   ore_count++;
+               } else {
+                    if (ore2.getID() == 11390 && ore3 != null && ore3.getID() == 11364) {
+                        ore3.interact();
+                        sleepUntil(()-> ore3.getID() == 11390, 1200);
+                        ore_count++;
+                    }
+                }}
+                break;
                case DROP:
                    getInventory().dropAll(mining_private.Constants.ore);
                break;

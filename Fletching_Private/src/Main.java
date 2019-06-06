@@ -1,6 +1,8 @@
 
 import java.awt.Graphics;
+import javafx.scene.paint.Color;
 import org.dreambot.api.methods.Calculations;
+import static org.dreambot.api.methods.MethodProvider.sleepUntil;
 import org.dreambot.api.methods.container.impl.bank.BankLocation;
 import org.dreambot.api.methods.magic.Normal;
 import org.dreambot.api.methods.skills.Skill;
@@ -44,23 +46,24 @@ public class Main extends AbstractScript {
         
     private void bank() {
           banking = true;
-          getBank().open(BankLocation.CASTLE_WARS);
-          sleep(Calculations.random(1020, 1222));
+          getBank().openClosest();
+          sleepUntil(()-> getBank().isOpen(), 2500);
           if (!getBank().contains(Constants.Longbow_unf) || !getBank().contains(Constants.bowstring)) {
              this.stop();
               }
-          //getBank().depositAll(Constants.longbow);
+          if (getBank().isOpen()) {
           getBank().depositAllItems();
-          sleep(Calculations.random(797, 937));
+          sleepUntil(()-> getInventory().emptySlotCount() == 28 , 2500);
           getBank().withdraw(Constants.Longbow_unf, 14);
-          sleep(Calculations.random(862, 959));
+          sleepUntil(()-> getInventory().count(Constants.Longbow_unf) == 14 , 2500);
           getBank().withdraw(Constants.bowstring, 14);
-          sleep(Calculations.random(622, 788));
+          sleepUntil(()-> getInventory().count(Constants.bowstring) == 14 , 2500);
           getBank().close();
+          sleepUntil(()-> !getBank().isOpen(), 2500);
           banking = false;
           fletching = true;
           //sleep(1000);
-}
+}}
         
         
 	@Override

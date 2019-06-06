@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package mining_private;
+package mining_private.beta;
 
+import mining_private.*;
 import org.dreambot.api.methods.map.Tile;
 
 /**
@@ -15,6 +16,7 @@ public class Constants {
     
     public static int ore = 440; //iron ore
     
-    public static Tile ironOre = new Tile(3029, 9720, 0);
+    //public static Tile ironOre = new Tile(3029, 9720, 0);
+     public static Tile ironOre = new Tile(2714, 3331, 0); //Ardougne
     
 }

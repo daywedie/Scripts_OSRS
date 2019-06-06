@@ -14,8 +14,9 @@ import org.dreambot.api.methods.map.Tile;
  */
 public class Constants {
     
-    public static int food = 385; //Food to take from bank //Shark
-    public static int food_amount = 7; //Amout of food to take from bank
+    public static int food = 385; //Food to take from bank = Shark
+    public static int food_amount = 7; //7
+    
     public static int roots_amount = 10; //Amount of roots & kindling to cut, fletch & feed
     public static int kindling_amount = 10;
     

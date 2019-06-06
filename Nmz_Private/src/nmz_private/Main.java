@@ -52,19 +52,21 @@ public class Main extends AbstractScript {
             
         }
 
-    private void bank() {
-          banking = true;
-          getBank().open(BankLocation.YANILLE);
-          sleep(Calculations.random(500, 1000));
-          getBank().depositAllItems();
-          sleep(Calculations.random(1000, 2500));
-          getBank().withdraw(Constants.Prayer_potion_4, 18);
-          sleep(Calculations.random(1500, 2500));
-          getBank().withdraw(Constants.Overload_4, 10);
-          getBank().close();
-          banking = false;
-          sleep(3000);
-}
+     private void bank() {
+           banking = true;
+           getBank().open(BankLocation.YANILLE);
+           sleepUntil(()-> getBank().isOpen() , 2500);
+          if (getBank().isOpen()) { 
+           getBank().depositAllItems();
+           sleepUntil(()-> getInventory().emptySlotCount() == 28 , 2500);
+           getBank().withdraw(Constants.Prayer_potion_4, 18);
+           sleepUntil(()-> getInventory().count(Constants.Prayer_potion_4) == 18 , 2500);
+           getBank().withdraw(Constants.Overload_4, 10);
+           sleepUntil(()-> getInventory().count(Constants.Overload_4) == 10 , 2500);
+           getBank().close();
+           sleepUntil(()-> !getBank().isOpen() , 2500);
+           banking = false;
+    }}
    
 @Override
 public void onMessage(Message msg) {
@@ -123,7 +125,7 @@ private void enterDream() {
 	private State getState() {
             //if (getSkillTracker().getGainedExperience(Skill.STRENGTH) > 6500000) {
                    //if (getSkills().getRealLevel(Skill.HITPOINTS) == 99 || timer.formatTime().toLowerCase().contains("04:00:15")) {
-                    if (getSkills().getExperience(Skill.HITPOINTS) >= 1302931|| timer.formatTime().toLowerCase().contains("04:00:15")) {
+                    if (getSkills().getExperience(Skill.HITPOINTS) >= 13000020 || timer.formatTime().toLowerCase().contains("04:00:15")) {
                     log("Time to Stop...");
                 sleep(3000);
                 this.stop();

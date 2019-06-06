@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package wintertodt_private;
+package wintertodt_beta;
 
+import wintertodt_private.*;
 import org.dreambot.api.methods.map.Area;
 import org.dreambot.api.methods.map.Tile;
 
@@ -14,9 +15,12 @@ import org.dreambot.api.methods.map.Tile;
  */
 public class Constants {
     
-    public static int food = 385; //Food to take from bank //Shark
-    public static int food_amount = 7; //Amout of food to take from bank
-    public static int roots_amount = 10; //Amount of roots & kindling to cut, fletch & feed
+    //public static int food = 385; //Food to take from bank = Shark
+    //public static int food_amount = 7; //7
+    public static int food = 361; //1891 = Cake, 361 = Tuna
+    public static int food_amount = 7; //7 Amout of food to take from bank for mid lvl pure
+    
+    public static int roots_amount = 10; //Amount of roots & kindling to cut, fletch & feed //10
     public static int kindling_amount = 10;
     
     public static int tinderbox = 590;

@@ -15,6 +15,6 @@ public class Constants {
     
     public static int ore = 440; //iron ore
     
-    public static Tile ironOre = new Tile(3029, 9720, 0);
+    public static Tile ironOre = new Tile(3029, 9720, 0); //Mining guild
     
 }

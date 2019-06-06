@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package mining_private;
+package mining_private.beta;
 
+import mining_private.*;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.util.Random;
@@ -25,7 +26,7 @@ import org.dreambot.api.wrappers.widgets.message.Message;
  *
  * @author t7emon
  */
-@ScriptManifest(author = "T7emon", name = "Mining_Beta", version = 1.0, description = "Mining Beta", category = Category.MINING)
+@ScriptManifest(author = "T7emon", name = "Mining_Beta", version = 1.0, description = "Mining Beta Ardougne", category = Category.MINING)
 
 public class Main extends AbstractScript {
     
@@ -77,15 +78,15 @@ public void onMessage(Message msg) {
 	};
 
 	private State getState() {
-        //if (mining_private.Constants.ironOre.distance(getLocalPlayer().getTile()) == 1) {
+        //if (mining_private.beta.Constants.ironOre.distance(getLocalPlayer().getTile()) == 1) {
         //mining = true;  
    // }
             
-        if (getInventory().count(mining_private.Constants.ore) > new Random().nextInt(6 + 1) + 10 || getInventory().isFull()) {
-              //if (getInventory().contains(mining_private.Constants.ore)) {
+        if (getInventory().count(mining_private.beta.Constants.ore) > new Random().nextInt(6 + 1) + 10 || getInventory().isFull()) {
+              //if (getInventory().contains(mining_private.beta.Constants.ore)) {
         return State.DROP;
         } else {
-      if (mining_private.Constants.ironOre.distance(getLocalPlayer().getTile()) < 2) {
+      if (mining_private.beta.Constants.ironOre.distance(getLocalPlayer().getTile()) < 2) {
      return State.MINE;
         }}
                 
@@ -98,25 +99,21 @@ public void onMessage(Message msg) {
       /*****************************************************************************************************************************/
 		switch (getState()) {
                case MINE:
-            GameObject ore1 = getGameObjects().getTopObjectOnTile(new Tile(3028, 9720, 0)); //7455 //7468
-            GameObject ore2 = getGameObjects().getTopObjectOnTile(new Tile(3029, 9721, 0)); //7455 
-            GameObject ore3 = getGameObjects().getTopObjectOnTile(new Tile(3030, 9720, 0)); //7455
-            if (ore1 != null && ore1.getID() == 7455) {
+            //GameObject ore1 = getGameObjects().getTopObjectOnTile(new Tile(3028, 9720, 0)); //7455 //7468
+            //GameObject ore2 = getGameObjects().getTopObjectOnTile(new Tile(3029, 9721, 0)); //7455 
+            //GameObject ore3 = getGameObjects().getTopObjectOnTile(new Tile(3030, 9720, 0)); //7455
+           GameObject ore1 = getGameObjects().getTopObjectOnTile(new Tile(2715, 3331, 0)); //7455  //7468
+            GameObject ore2 = getGameObjects().getTopObjectOnTile(new Tile(2714, 3330, 0)); //7488 //7469
+            if (ore1 != null && ore1.getID() == 7455) { 
                 ore1.interact();
               sleepUntil(()-> ore1.getID() == 7468, 1200);
               ore_count++;
             } else {
-                if (ore1.getID() == 7468 && ore2 != null && ore2.getID() == 7455) {
+                if (ore1.getID() == 7468 && ore2 != null && ore2.getID() == 7488) {
                     ore2.interact();
-                   sleepUntil(()-> ore2.getID() == 7468, 1200);
+                   sleepUntil(()-> ore2.getID() == 7469, 1200);
                    ore_count++;
-               } else {
-                    if (ore2.getID() == 7468 && ore3 != null && ore3.getID() == 7455) {
-                        ore3.interact();
-                        sleepUntil(()-> ore3.getID() == 7468, 1200);
-                        ore_count++;
-                    }
-                }}
+          }}
                 break;
                  /*   case MINE:
             GameObject ore1 = getGameObjects().getTopObjectOnTile(new Tile(3028, 9720, 0)); //7455 //7468
@@ -131,7 +128,7 @@ public void onMessage(Message msg) {
              sleepUntil(()-> ore3.getID() == 7468, 1670);
                         break;*/
                case DROP:
-                   getInventory().dropAll(mining_private.Constants.ore);
+                   getInventory().dropAll(mining_private.beta.Constants.ore);
                break;
                 case SLEEP:
                    sleep(Calculations.random(0, 0));

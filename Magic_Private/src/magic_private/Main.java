@@ -20,7 +20,6 @@ import static org.dreambot.api.methods.MethodProvider.sleep;
 import static org.dreambot.api.methods.MethodProvider.sleepUntil;
 import org.dreambot.api.methods.container.impl.Inventory;
 import org.dreambot.api.methods.container.impl.bank.BankLocation;
-import org.dreambot.api.methods.container.impl.bank.BankType;
 import org.dreambot.api.methods.dialogues.Dialogues;
 import org.dreambot.api.methods.filter.impl.NameFilter;
 import org.dreambot.api.methods.magic.Normal;
@@ -64,12 +63,18 @@ public class Main extends AbstractScript {
         
     private void bank() {
           banking = true;
-          getBank().open(BankLocation.GRAND_EXCHANGE);
-          sleep(Calculations.random(1833, 1995));
+          //getBank().openClosest();
+          GameObject bank = getGameObjects().closest(gameObject -> gameObject != null && gameObject.hasAction("Bank"));
+          //bank.interactForceRight("Bank");
+          bank.interact();
+          //etBank().open(BankLocation.GRAND_EXCHANGE);
+          sleepUntil(() -> getBank().isOpen(), 3000);
           //getBank().deposit(Constants.iron_bar, 27);
           getBank().depositAllExcept(Constants.nature_rune);
-          sleep(Calculations.random(897, 1037));
-          getBank().withdrawAll(Constants.iron_ore);
+          sleepUntil(() -> getInventory().emptySlotCount() >= 26, 3000);
+          getBank().withdraw(Constants.iron_ore, 27);
+           sleepUntil(() -> getInventory().count(Constants.iron_ore) >= 27, 1500);
+          //getBank().withdrawAll(Constants.iron_ore);
           //getBank().withdraw(Constants.iron_ore, 27);
           getBank().close();
           banking = false;
@@ -84,33 +89,63 @@ public class Main extends AbstractScript {
             
             if (alching) {
                     getMagic().castSpell(Normal.HIGH_LEVEL_ALCHEMY);
-                    getInventory().get("Mithril platebody").interact();
+                    Item item = getInventory().get("Steel platelegs");
+                    item.interact();
                     sleepUntil(() -> !getLocalPlayer().isAnimating(),3000);
                 }
             
 		     if (superheat) {
-                     if (!banking && !getMagic().isSpellSelected() && getInventory().contains(Constants.iron_ore)) {
-                    getMagic().castSpell(Normal.SUPERHEAT_ITEM);
-                    getInventory().getRandom(Constants.iron_ore).interact();
-                      //getInventory().get(Constants.iron_ore).interact();
-                     sleepUntil(()-> !getLocalPlayer().isAnimating(),1500);
-                      }
-                      if (!getInventory().contains(Constants.iron_ore)) {
-                             sleep(Calculations.random(1256, 1467));
+                     if (!getInventory().contains(Constants.nature_rune)) {
+                       this.stop();
+                     }
+                     //if (!getMagic().canCast(Normal.SUPERHEAT_ITEM)) {
+                         //log("You need 43 Magic & 15 smithing to cast this spell.");
+                         //this.stop();
+                   // }
+                     if (!getInventory().contains(Constants.iron_ore)) {
+                     if (getMagic().isSpellSelected()) {
+                             getMouse().click();
+                         } else {
+                             //sleep(Calculations.random(425, 750));
                              bank();
-                      } 
-                      if (!getInventory().contains(Constants.nature_rune)) {
-                          this.stop();
-}}
-		return Calculations.random(247, 676);
+                     }}
+                     if (!banking && !getMagic().isSpellSelected() && getInventory().contains(Constants.iron_ore)) {
+                                                   // sleepUntil(()-> !getLocalPlayer().isAnimating(), 1500);
+                         //sleep(Calculations.random(100, 110));
+                    getMagic().castSpell(Normal.SUPERHEAT_ITEM);
+                    Item item = getInventory().get(Constants.iron_ore);
+                      if (getMagic().isSpellSelected()) {
+                          //getInventory().getRandom(Constants.iron_ore).interact();
+                          item.interact();
+                         // sleepUntil(()-> item.interact(), 1500);
+                      }}
+                     }
+                    /* if (!banking && !getMagic().isSpellSelected() && getInventory().contains(Constants.iron_ore)) {
+                    sleep(Calculations.random(350, 425));
+                    getMagic().castSpell(Normal.SUPERHEAT_ITEM);
+                    Item item = getInventory().getItemInSlot(10);
+                    if (item.getID() == Constants.iron_ore) {
+                   if (getMagic().isSpellSelected()) {
+                    item.interact();
+                    sleepUntil(()-> !getLocalPlayer().isAnimating(), 1500);
+                   }
+                     } else {
+                    getInventory().interact(Constants.iron_ore, "Cast");
+                    //getInventory().getRandom(Constants.iron_ore).interact();
+                      //getInventory().get(Constants.iron_ore).interact();
+                     sleepUntil(()-> !getLocalPlayer().isAnimating(), 1500);
+                      }}}*/
+		return Calculations.random(0, 0);
         }
         
 @Override
 	public void onPaint(Graphics g){
 			//g.drawString("State: " + getState().toString(), 10, 35);
 			g.drawString("Runtime: " + timer.formatTime(), 10, 35);
-                        g.drawString("Magic exp (p/h): " + getSkillTracker().getGainedExperiencePerHour(Skill.MAGIC) , 10, 65);
-                        g.drawString("Smithing exp (p/h): " + getSkillTracker().getGainedExperiencePerHour(Skill.SMITHING) , 10, 75);
+                        //g.drawString("Magic exp (p/h): " + getSkillTracker().getGainedExperiencePerHour(Skill.MAGIC) , 10, 65);
+                        g.drawString("Magic exp (p/h): " + getSkillTracker().getGainedExperience(Skill.MAGIC) + "(" + getSkillTracker().getGainedExperiencePerHour(Skill.MAGIC) + ")", 10, 65); //65
+                        g.drawString("Smithing exp (p/h): " + getSkillTracker().getGainedExperience(Skill.SMITHING) + "(" + getSkillTracker().getGainedExperiencePerHour(Skill.SMITHING) + ")", 10, 75); //75
+                        //g.drawString("Smithing exp (p/h): " + getSkillTracker().getGainedExperiencePerHour(Skill.SMITHING) , 10, 75);
                                             
                        
 }}

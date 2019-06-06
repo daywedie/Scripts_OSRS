@@ -5,6 +5,7 @@
  */
 package herblore_private;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import org.dreambot.api.methods.Calculations;
 import static org.dreambot.api.methods.MethodProvider.log;
@@ -47,28 +48,24 @@ public class Main extends AbstractScript {
         
     private void bank() {
           banking = true;
-          //getBank().open(BankLocation.CASTLE_WARS);
           getBank().openClosest();
-          sleep(Calculations.random(1020, 1222));
+           sleepUntil(()-> getBank().isOpen() , 2500);
           if (!getBank().contains(Constants.kwuarm_unf) || !getBank().contains(Constants.limpwurt_root)) {
              this.stop();
               }
-          //getBank().depositAll(Constants.longbow);
+          if (getBank().isOpen()) {
           getBank().depositAllItems();
-          sleep(Calculations.random(797, 937));
+          sleepUntil(()-> getInventory().emptySlotCount() == 28 , 2500);
           getBank().withdraw(Constants.limpwurt_root, 14);
-          sleep(Calculations.random(862, 959));
+          sleepUntil(()-> getInventory().count(Constants.limpwurt_root) == 14 , 2500);
           getBank().withdraw(Constants.kwuarm_unf, 14);
-          sleep(Calculations.random(622, 788));
+          sleepUntil(()-> getInventory().count(Constants.kwuarm_unf) == 14 , 2500);
           getBank().close();
+          sleepUntil(()-> !getBank().isOpen() , 2500);
           banking = false;
           herblore = true;
           //sleep(1000);
-}
-    
-    private void Widthdraw() {
-        
-    }
+}}
         
         
 	@Override
@@ -98,8 +95,9 @@ public class Main extends AbstractScript {
 @Override
 	public void onPaint(Graphics g){
 			//g.drawString("State: " + getState().toString(), 10, 35);
+                        g.setColor(Color.green);
 			g.drawString("Runtime: " + timer.formatTime(), 10, 35);
-                        g.drawString("Herblore exp (p/h): " + getSkillTracker().getGainedExperiencePerHour(Skill.HERBLORE) , 10, 65);
+                        g.drawString("Herblore exp (p/h): " + getSkillTracker().getGainedExperience(Skill.HERBLORE) + "(" + getSkillTracker().getGainedExperiencePerHour(Skill.HERBLORE) + ")", 10, 65);
                        
                                             
                        

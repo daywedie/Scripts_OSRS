@@ -73,7 +73,7 @@ public class Main_Private extends AbstractScript {
    
           if(getBank().isOpen()) {
           sleep(900);
-          getBank().depositAllExcept(item -> item != null && item.getName().equals("Tinderbox") || item.getName().equals("Dragon axe") || item.getName().equals("Knife"));
+          getBank().depositAllExcept(item -> item != null && item.getName().equals("Tinderbox") || item.getName().toLowerCase().endsWith("axe") || item.getName().equals("Knife"));
           //getBank().depositAllExcept(item -> item != null && item.getName().toLowerCase().contains("tinderbox") && item.getName().toLowerCase().contains("axe") && item.getName().toLowerCase().contains("knife"));
           //sleep(Calculations.random(1100, 1230));
           sleepUntil(() -> getInventory().emptySlotCount() == 25, 5000);

@@ -19,7 +19,7 @@ public class Constants {
         public static int food = 379; //Food to take from bank || 385 = Shark, 379 = Lobster
         public static int food_amount = 5; //Amout of food to take from bank
         public static int stamina = 343;
-         public static Tile WALL_LOCATION = new Tile(2729, 3489, 0);
+         public static Tile WALL_LOCATION = new Tile(2729, 3488, 0);
          public static Area FIRST_ROOF = new Area(2730, 3497, 2722, 3490, 3); //x1, y2, x2, y2, z
          public static Area SECOND_ROOF = new Area(2713, 3493, 2705, 3496, 2); //x1, y2, x2, y2
          public static Area THIRD_ROOF = new Area(2716, 3482, 2710, 3477, 2); //x1, y2, x2, y2

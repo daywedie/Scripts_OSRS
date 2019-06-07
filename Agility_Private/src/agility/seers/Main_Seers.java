@@ -27,7 +27,7 @@ import org.dreambot.api.wrappers.widgets.message.Message;
  *
  * @author t7emon
  */
-@ScriptManifest(author = "T7emon", name = "Agility_Seers_Beta", version = 1.0, description = "Agility Seers_Beta", category = Category.AGILITY)
+@ScriptManifest(author = "T7emon", name = "Agility_Seers", version = 1.0, description = "Agility Seers", category = Category.AGILITY)
 
 public class Main_Seers extends AbstractScript {
     
@@ -109,21 +109,17 @@ public void onMessage(Message msg) {
     private void enterRoof() {
        
             log("STATUS = ENTER");
-        getWalking().walk(Constants.WALL_LOCATION.getRandomizedTile());
-        sleepUntil(() -> getLocalPlayer().getTile().equals(Constants.WALL_LOCATION), 3500);
-            GameObject wall = getGameObjects().closest(11373);
-    if(wall.interactForceRight("Climb-up")){
-                            sleep(Calculations.random(3000, 3500));
+            GameObject wall = getGameObjects().closest(gameObject -> gameObject != null && gameObject.getName().equals("Wall"));
+        getWalking().walk(wall.getTile());
+        //sleepUntil(() -> wall.exists(), 3500);
+             if  (wall.isOnScreen() && wall.interactForceRight("Climb-up")) {
+                            sleepUntil(() -> inArea(Constants.FIRST_ROOF), 3500);
                            entered = true;
-    }
+    }}
                            //getWalking().walk(Constants.TREE_LOCATION.getRandomizedTile()); //WALK TO TREE
                             //Sleep(Calculations.random(3000, 3200));
-    }
     
     private void Roofs() {
-                GameObject gap = getGameObjects().closest(gameObject -> gameObject != null && gameObject.hasAction("Jump")); //FIRST
-                GameObject rope = getGameObjects().closest(11378);
-                GameObject edge = getGameObjects().closest(11377);
                GroundItem mark = getGroundItems().closest(11849);
            /*
             * FIRST ROOF
@@ -135,6 +131,7 @@ public void onMessage(Message msg) {
                sleepUntil(() -> !mark.exists(), 3500);
                marks++;
            }
+          GameObject gap = getGameObjects().closest(gameObject -> gameObject != null && gameObject.getX() == 2720 && gameObject.getY() == 3492);
     if(gap.interact()){
         sleepUntil(() -> inArea(Constants.SECOND_ROOF), 3500);
     }}
@@ -148,6 +145,7 @@ public void onMessage(Message msg) {
                sleepUntil(() -> !mark.exists(), 3500);
                marks++;
            }
+    GameObject rope = getGameObjects().closest(gameObject -> gameObject != null && gameObject.getX() == 2710 && gameObject.getY() == 3489);
     if(rope.interact()){
         sleepUntil(() -> inArea(Constants.THIRD_ROOF), 3500);
     }}
@@ -161,6 +159,7 @@ public void onMessage(Message msg) {
                sleepUntil(() -> !mark.exists(), 3500);
                marks++;
            }
+     GameObject gap = getGameObjects().closest(gameObject -> gameObject != null && gameObject.getX() == 2710 && gameObject.getY() == 3476);
     if(gap.interact()){
         sleepUntil(() -> inArea(Constants.FOURTH_ROOF), 3500);
     }}
@@ -175,8 +174,9 @@ public void onMessage(Message msg) {
                sleepUntil(() -> !mark.exists(), 3500);
                marks++;
            }
-        getWalking().walk(new Tile(2705, 3472, 3));
-        sleepUntil(() -> getLocalPlayer().distance(gap.getTile()) <= 5, 3000);
+        //getWalking().walk(new Tile(2705, 3472, 3));
+       // sleepUntil(() -> getLocalPlayer().distance(gap.getTile()) <= 5, 3000);
+        GameObject gap = getGameObjects().closest(gameObject -> gameObject != null && gameObject.hasAction("Jump"));
     if(gap.interact()){
         sleepUntil(() -> inArea(Constants.FINAL_ROOF), 3500);
     }}   
@@ -190,6 +190,7 @@ public void onMessage(Message msg) {
                sleepUntil(() -> !mark.exists(), 3500);
                marks++;
            }
+     GameObject edge = getGameObjects().closest(gameObject -> gameObject != null && gameObject.hasAction("Jump"));
     if(edge.interact()){
         sleepUntil(() -> !inArea(Constants.FINAL_ROOF), 3500);
         laps++;
@@ -210,10 +211,10 @@ public void onMessage(Message msg) {
 	};
                 
                 private State getState() {
-                if (getSkills().getBoostedLevels(Skill.HITPOINTS) < 10) {
+                if (getSkills().getBoostedLevels(Skill.HITPOINTS) < 7) {
                     this.stop();
                 }
-                if (getSkills().getBoostedLevels(Skill.HITPOINTS) < 50) {
+                if (getSkills().getBoostedLevels(Skill.HITPOINTS) < 10) {
                     getInventory().get(Constants.food).interact("Eat");
                 }
                 if (getWalking().getRunEnergy() <= 15) {

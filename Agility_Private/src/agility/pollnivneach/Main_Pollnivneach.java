@@ -98,13 +98,13 @@ public void onMessage(Message msg) {
                /**
                 * Make sure we don't die..
                 */
-                if (getSkills().getBoostedLevels(Skill.HITPOINTS) < 10) {
+                if (getSkills().getBoostedLevels(Skill.HITPOINTS) < 7) { //10
                     this.stop();
                 }
                /**
                 * Eats food when needed..
                 */
-                if (getSkills().getBoostedLevels(Skill.HITPOINTS) < 50) {
+                if (getSkills().getBoostedLevels(Skill.HITPOINTS) < 10) { //50
                     getInventory().get(agility.pollnivneach.Constants.food).interact("Eat");
                 }
                /**
@@ -155,70 +155,69 @@ public void onMessage(Message msg) {
 	public int onLoop() {
             switch (getState()) {
                 case CLIMB:
-                    GameObject basket = getGameObjects().closest(11380);
-                    if (basket.isOnScreen()) {
-                        basket.interactForceRight("Climb-on");
+                   GameObject Basket = getGameObjects().closest(gameObject -> gameObject != null && gameObject.getName().equals("Basket") && gameObject.hasAction("Climb-on"));
+                    if (Basket.isOnScreen()) {
+                        Basket.interactForceRight("Climb-on");
                         entered = true;
                     } else {
-                        getWalking().walkExact(Constants.BASKET_LOCATION);
-                        sleepUntil(() -> basket.isOnScreen(), 4000);
+                        getWalking().walkExact(Basket.getTile());
+                        sleepUntil(() -> Basket.isOnScreen(), 4000);
                     }
                 break;
                 case ROOFS:
                     if (inArea(Constants.FIRST_ROOF)) {
                          log ("In FIRST_ROOF AREA");
-                         GameObject stall = getGameObjects().closest(11381);
-                         stall.interact();
+                         GameObject Market_stall = getGameObjects().closest(gameObject -> gameObject != null && gameObject.getName().equals("Market stall") && gameObject.hasAction("Jump-on"));
+                         Market_stall.interact();
                           sleepUntil(() -> inArea(Constants.SECOND_ROOF), 5000);
                     }
                     if (inArea(Constants.SECOND_ROOF)) {
                         log ("In SECOND_ROOF AREA");
-                        //sleep(550, 600);
+                        sleep(550, 600);
                         getWalking().walk(new Tile(3354, 2975, 1));
-                        GameObject banner = getGameObjects().closest(11382);
-                        if (banner.isOnScreen()) {
-                        //GameObject banner = getGameObjects().getTopObjectOnTile(new Tile(3356, 2978, 1));
-                        banner.interactForceRight("Grab");
+                        GameObject Banner = getGameObjects().closest(gameObject -> gameObject != null && gameObject.getName().equals("Banner") && gameObject.hasAction("Grab"));
+                        if (Banner.isOnScreen()) {               
+                        Banner.interactForceRight("Grab");
                         sleepUntil(() -> inArea(Constants.THIRD_ROOF), 3000);
                     }}
                     if (inArea(Constants.THIRD_ROOF)) {
                         log ("In THIRD_ROOF AREA");
-                        GameObject gap = getGameObjects().closest(11383);
-                        gap.interact();
+                        GameObject Gap = getGameObjects().closest(gameObject -> gameObject != null && gameObject.getName().equals("Gap") && gameObject.hasAction("Leap"));
+                        Gap.interact();
                         sleepUntil(() -> inArea(Constants.FOURTH_ROOF), 3000);
                     }
                     if (inArea(Constants.FOURTH_ROOF)) {
                         log ("In FOURTH_ROOF AREA");
-                        GameObject tree = getGameObjects().closest(11384);
-                        tree.interact();
+                        GameObject Tree = getGameObjects().closest(gameObject -> gameObject != null && gameObject.getName().equals("Tree") && gameObject.hasAction("Jump-to"));
+                        Tree.interact();
                         sleepUntil(() -> inArea(Constants.FIFTH_ROOF), 3000);
                     }
                     if (inArea(Constants.FIFTH_ROOF)) {
                         log ("In FIFTH_ROOF AREA");
-                        GameObject wall = getGameObjects().closest(11385);
-                        wall.interact();
+                        GameObject Rough_wall = getGameObjects().closest(gameObject -> gameObject != null && gameObject.getName().equals("Rough wall") && gameObject.hasAction("Climb"));
+                        Rough_wall.interact();
                         sleepUntil(() -> inArea(Constants.SIXTH_ROOF), 5000);
                     }
                     if (inArea(Constants.SIXTH_ROOF)) {
                        log ("In SIXTH_ROOF AREA");
-                        GameObject bars = getGameObjects().closest(11386);
-                        bars.interactForceRight("Cross");
+                        GameObject Monkeybars = getGameObjects().closest(gameObject -> gameObject != null && gameObject.getName().equals("Monkeybars") && gameObject.hasAction("Cross"));
+                        Monkeybars.interactForceRight("Cross");
                         sleepUntil(() -> inArea(Constants.SEVENTH_ROOF), 3000);
                     }
                     if (inArea(Constants.SEVENTH_ROOF)) {
                         log ("In SEVENTH_ROOF AREA");
-                        GameObject tree2 = getGameObjects().closest(11389);
-                        tree2.interact();
+                        GameObject Tree = getGameObjects().closest(gameObject -> gameObject != null && gameObject.getName().equals("Tree") && gameObject.hasAction("Jump-on"));
+                        Tree.interact();
                         sleepUntil(() -> inArea(Constants.FINAL_ROOF), 3000);
                     }
                     if (inArea(Constants.FINAL_ROOF)) {
                        log ("In FINAL_ROOF AREA");
                         sleep(600);
-                         GameObject line = getGameObjects().closest(11390);
-                         line.interact();
+                         GameObject Drying_line = getGameObjects().closest(gameObject -> gameObject != null && gameObject.getName().equals("Drying line") && gameObject.hasAction("Jump-to"));
+                         Drying_line.interact();
                          sleepUntil(() -> !inRoof(), 3000);
                          laps++;
-                         entered = false;
+                         //entered = false;
                     }
                 break;
             }

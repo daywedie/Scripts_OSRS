@@ -34,12 +34,9 @@ public class Main extends AbstractScript {
     private Timer timer;
     boolean mining;
     private int ore_count = 0;
-    //private PricedItem crate = null;
-     //private Tile myLocation = getLocalPlayer().getTile();
     
             public void init() {
                timer = new Timer();
-               //crate = new PricedItem("Supply crate",getClient().getMethodContext(), false);
                getSkillTracker().start(Skill.MINING);
                log("Initialized");
             
@@ -78,12 +75,8 @@ public void onMessage(Message msg) {
 	};
 
 	private State getState() {
-        //if (mining_private.beta.Constants.ironOre.distance(getLocalPlayer().getTile()) == 1) {
-        //mining = true;  
-   // }
             
-        if (getInventory().count(mining_private.beta.Constants.ore) > new Random().nextInt(6 + 1) + 10 || getInventory().isFull()) {
-              //if (getInventory().contains(mining_private.beta.Constants.ore)) {
+        if (getInventory().count(mining_private.beta.Constants.ore) > new Random().nextInt(7 + 1) + 10 || getInventory().isFull()) {
         return State.DROP;
         } else {
       if (mining_private.beta.Constants.ironOre.distance(getLocalPlayer().getTile()) < 2) {
@@ -99,42 +92,28 @@ public void onMessage(Message msg) {
       /*****************************************************************************************************************************/
 		switch (getState()) {
                case MINE:
-            //GameObject ore1 = getGameObjects().getTopObjectOnTile(new Tile(3028, 9720, 0)); //7455 //7468
-            //GameObject ore2 = getGameObjects().getTopObjectOnTile(new Tile(3029, 9721, 0)); //7455 
-            //GameObject ore3 = getGameObjects().getTopObjectOnTile(new Tile(3030, 9720, 0)); //7455
            GameObject ore1 = getGameObjects().getTopObjectOnTile(new Tile(2715, 3331, 0)); //7455  //7468
-            GameObject ore2 = getGameObjects().getTopObjectOnTile(new Tile(2714, 3330, 0)); //7488 //7469
-            if (ore1 != null && ore1.getID() == 7455) { 
+           GameObject ore2 = getGameObjects().getTopObjectOnTile(new Tile(2714, 3330, 0)); //7488 //7469
+            if (ore1 != null && ore1.getID() == 11364) { 
                 ore1.interact();
-              sleepUntil(()-> ore1.getID() == 7468, 1200);
+              sleepUntil(()-> ore1.getID() == 11390, 1200);
+              //sleepUntil(()-> ore1.getModifiedModelColors(), 1200);
               ore_count++;
             } else {
-                if (ore1.getID() == 7468 && ore2 != null && ore2.getID() == 7488) {
+                if (ore1.getID() == 11390 && ore2 != null && ore2.getID() == 11365) {
                     ore2.interact();
-                   sleepUntil(()-> ore2.getID() == 7469, 1200);
+                   sleepUntil(()-> ore2.getID() == 11391, 1200);
                    ore_count++;
           }}
                 break;
-                 /*   case MINE:
-            GameObject ore1 = getGameObjects().getTopObjectOnTile(new Tile(3028, 9720, 0)); //7455 //7468
-            GameObject ore2 = getGameObjects().getTopObjectOnTile(new Tile(3029, 9721, 0)); //7455 
-            GameObject ore3 = getGameObjects().getTopObjectOnTile(new Tile(3030, 9720, 0)); //7455
-            ore1.interact();
-             sleepUntil(()-> ore1.getID() == 7468, 1670);
-            //sleep(1100);
-            ore2.interact();
-             sleepUntil(()-> ore2.getID() == 7468, 1670);
-            ore3.interact();
-             sleepUntil(()-> ore3.getID() == 7468, 1670);
-                        break;*/
                case DROP:
                    getInventory().dropAll(mining_private.beta.Constants.ore);
                break;
                 case SLEEP:
-                   sleep(Calculations.random(0, 0));
+                   sleep(Calculations.random(102, 498));
                  break;
                 }
-		return Calculations.random(0, 0);
+		return Calculations.random(198, 956);
         }
 
 @Override

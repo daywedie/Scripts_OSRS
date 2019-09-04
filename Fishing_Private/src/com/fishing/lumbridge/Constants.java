@@ -1,10 +1,4 @@
-package com.fishing.barbarian;
-
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+package com.fishing.lumbridge;
 
 /**
  *
@@ -12,10 +6,14 @@ package com.fishing.barbarian;
  */
 public class Constants {
     
-    public static int Barbarian_rod = 11323;
+    public static int Small_fishing_net = 303;
+    
+    public static int fly_fishing_rod = 309;
     public static int Feathers = 314;
     
-      public static int Leaping_trout = 11328;
-      public static int Leaping_salmon = 11330;
-      public static int Leaping_sturgeon = 11332;
+      public static int Raw_shrimps = 317; 
+      public static int Raw_anchovies = 321; 
+      public static int Raw_trout = 335;
+      public static int Raw_salmon = 331;
+      //public static int Leaping_sturgeon = 11332;
 }

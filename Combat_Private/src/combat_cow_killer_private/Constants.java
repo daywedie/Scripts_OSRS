@@ -1,4 +1,4 @@
-package com.fishing.barbarian;
+package combat_cow_killer_private;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -12,10 +12,9 @@ package com.fishing.barbarian;
  */
 public class Constants {
     
-    public static int Barbarian_rod = 11323;
-    public static int Feathers = 314;
+    public static boolean food_enabled = true;
+    public static int food = 361; //361 = tuna
+    public static int food_amount = 10;
     
-      public static int Leaping_trout = 11328;
-      public static int Leaping_salmon = 11330;
-      public static int Leaping_sturgeon = 11332;
+    public static String NPC = "Cow";
 }

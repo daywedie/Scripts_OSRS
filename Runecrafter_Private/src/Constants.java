@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import static java.util.Collections.list;
 import java.util.List;
+import org.dreambot.api.methods.map.Area;
 import org.dreambot.api.methods.map.Tile;
+import org.dreambot.api.wrappers.interactive.GameObject;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -17,6 +19,9 @@ import org.dreambot.api.methods.map.Tile;
  * @author t7emon
  */
 public class Constants {
+    
+      public static Area Duel_Area = new Area(3323, 3230, 3305, 3268, 0); //x1, y2, x2, y2, z
+      public static Area Altar_Area = new Area(2569, 4853, 2594, 4823, 0); //x1, y2, x2, y2, z
    
     public static int ring_of_duelling8 = 2552; //ring of duelling 8
     public static int ring_of_duelling7 = 2554; //ring of duelling 7
@@ -27,11 +32,7 @@ public class Constants {
     public static int ring_of_duelling2 = 2564; //ring of duelling 2
     public static int ring_of_duelling1 = 2566; //ring of duelling 1 to remove and take another for bank if needed
     
-    public static int rune_to_craft = 1436;  //Rune essence
-    public static int talisman = 1442; //fire talisman
-    
-    public static int mysterious_ruins_id = 14993;
-    public static int altar_id = 14901;
+    public static int rune_to_craft = 7936;  //Pure essence
      
     public static Tile mysterious_ruins_tile = new Tile(3312, 3252, 0);
     public static Tile altar_tile = new Tile(2583, 4841, 0);

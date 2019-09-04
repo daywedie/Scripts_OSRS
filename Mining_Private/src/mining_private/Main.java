@@ -82,7 +82,6 @@ public void onMessage(Message msg) {
    // }
             
         if (getInventory().count(mining_private.Constants.ore) > new Random().nextInt(6 + 1) + 10 || getInventory().isFull()) {
-              //if (getInventory().contains(mining_private.Constants.ore)) {
         return State.DROP;
         } else {
       if (mining_private.Constants.ironOre.distance(getLocalPlayer().getTile()) < 2) {
@@ -97,28 +96,6 @@ public void onMessage(Message msg) {
 	public int onLoop() {
       /*****************************************************************************************************************************/
 		switch (getState()) {                  
-            /*case MINE:
-            GameObject ore1 = getGameObjects().getTopObjectOnTile(new Tile(3028, 9720, 0)); //7455 //7468
-            GameObject ore2 = getGameObjects().getTopObjectOnTile(new Tile(3029, 9721, 0)); //7455 
-            GameObject ore3 = getGameObjects().getTopObjectOnTile(new Tile(3030, 9720, 0)); //7455
-            if (ore1 != null && ore1.getID() == 7455) { 
-                ore1.interact();
-              sleepUntil(()-> ore1.getID() == 7468, 1200);
-              ore_count++;
-            } else {
-                if (ore1.getID() == 7468 && ore2 != null && ore2.getID() == 7455) {
-                    ore2.interact();
-                   sleepUntil(()-> ore2.getID() == 7468, 1200);
-                   ore_count++;
-               } else {
-                    if (ore2.getID() == 7468 && ore3 != null && ore3.getID() == 7455) {
-                        ore3.interact();
-                        sleepUntil(()-> ore3.getID() == 7468, 1200);
-                        ore_count++;
-                    }
-                }}
-                break;
-                */
             case MINE:
             GameObject ore1 = getGameObjects().getTopObjectOnTile(new Tile(3028, 9720, 0)); //7455 //7468
             GameObject ore2 = getGameObjects().getTopObjectOnTile(new Tile(3029, 9721, 0)); //7455 
@@ -144,10 +121,12 @@ public void onMessage(Message msg) {
                    getInventory().dropAll(mining_private.Constants.ore);
                break;
                 case SLEEP:
-                   sleep(Calculations.random(0, 0));
+                    sleep(Calculations.random(0, 0));
+                   //sleep(Calculations.random(117, 457));
                  break;
                 }
-		return Calculations.random(0, 0);
+                return Calculations.random(0, 0);
+		//return Calculations.random(127, 777);
         }
 
 @Override

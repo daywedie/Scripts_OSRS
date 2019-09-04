@@ -1,4 +1,4 @@
-package com.fishing.barbarian;
+package combat_cow_killer_private;
 
 
 import java.awt.Color;
@@ -23,87 +23,122 @@ import org.dreambot.api.wrappers.widgets.message.Message;
  *
  * @author t7emon
  */
-@ScriptManifest(author = "T7emon", name = "Fishing_Private", version = 1.0, description = "Barbarian Fishing", category = Category.FISHING)
+@ScriptManifest(author = "T7emon", name = "Cow_Killer_Private", version = 1.0, description = "Kill Cows", category = Category.COMBAT)
 
 public class Main extends AbstractScript {
     
     private Timer timer;
-    private int fish_count = 0;
-    
+    private int kills = 0;
+    boolean Strength=false; boolean Attack=false; boolean Defence=false; boolean Magic=false; boolean Range=true;
             public void init() {
                timer = new Timer();
-               getSkillTracker().start(Skill.FISHING);
-               getSkillTracker().start(Skill.AGILITY);
+               getSkillTracker().start(Skill.HITPOINTS);
+               if (Strength) {
                getSkillTracker().start(Skill.STRENGTH);
+               } else {
+               if (Attack) {
+               getSkillTracker().start(Skill.ATTACK);
+               } else {
+               if (Defence) {
+               getSkillTracker().start(Skill.DEFENCE);
+               } else {
+               if (Magic) {
+               getSkillTracker().start(Skill.MAGIC);
+               } else {
+               if (Range) {
+               getSkillTracker().start(Skill.RANGED);
+               }
                log("Initialized");
-            
-        }
+        }}}}}
 
     @Override
 	public void onStart() {
             init();
-		log("Welcome to Fishing Bot by T7emon.");
+		log("Welcome to Cow Killer Bot by T7emon.");
 		log("If you experience any issues while running this script please report them to me on the forums.");
-		log("Enjoy the script, gain some Fishing levels!.");
+		log("Enjoy the script, gain some Combat levels!.");
         }
         
             @Override
 public void onMessage(Message msg) {
-	if (msg.getMessage().contains("You catch a leaping trout.") || msg.getMessage().contains("You catch a leaping salmon.") || msg.getMessage().contains("You catch a leaping sturgeon.")) {
-           fish_count++;
+	if (msg.getMessage().contains("There is no ammo left in your quiver.")) {
+            log("There is no ammo left in your quiver.");
+           this.stop();
         }
 }
        
         	private enum State {
-               FISH, DROP
+               BANK, FIGHT, EAT, SLEEP
 	};
                 
         private State getState() {
             
-            if (!getInventory().contains(Constants.Barbarian_rod) || !getInventory().contains(Constants.Feathers)) {
-                log("You need a Barbarian rod & Feathers to use this script!");
+            if (!getInventory().contains(Constants.food) && Constants.food_enabled) {
+                log("You need food We dont bank just stop");
                 this.stop();
             }
             
               if (getDialogues().inDialogue()) {
                      getDialogues().clickContinue();
-                     return State.FISH;
+                     return State.FIGHT;
                }
-              if (getInventory().count(Constants.Leaping_trout) > new Random().nextInt(6 + 1) + 10 
-                || getInventory().count(Constants.Leaping_salmon) > new Random().nextInt(6 + 1) + 10 
-                || getInventory().count(Constants.Leaping_sturgeon) > new Random().nextInt(6 + 1) + 10 
-                || getInventory().isFull()) {
-              return State.DROP;
+              
+              if (getNpcs().closest(Constants.NPC).isOnScreen() && !getNpcs().closest(Constants.NPC).isInCombat() && !getLocalPlayer().isInCombat()) {
+                  sleep(Calculations.random(1017, 2117));
+                  return State.FIGHT;
               }
-            return State.FISH;
+              
+              if (getLocalPlayer().getHealthPercent() < 40) {
+                  return State.EAT;
+              }
+            
+            return State.SLEEP;
         }
         
 	@Override
 	public int onLoop() {
             switch (getState()) {
-                case FISH:
-                    NPC Fishing_spot = getNpcs().closest("Fishing spot");
-                     if (!getLocalPlayer().isInteracting(Fishing_spot) && Fishing_spot.interactForceRight("Use-rod")) {
-                        sleepUntil(()-> !getLocalPlayer().isInteracting(Fishing_spot), 240000);
-                    }
+                
+                case BANK:
+                //TODO
                 break;
-                case DROP:
-                    getInventory().dropAllExcept(Constants.Barbarian_rod, Constants.Feathers);
-                     sleepUntil(()-> !getInventory().contains(Constants.Leaping_trout) || !getInventory().contains(Constants.Leaping_salmon) || !getInventory().contains(Constants.Leaping_sturgeon) , 240000);
+                
+                case FIGHT:
+                NPC npc = getNpcs().closest(Constants.NPC);
+                if (npc.interact()) {
+                    sleepUntil(() -> !npc.isDrawMinimapDot(), 10000);
+                    kills++;
+                }
                 break;
+                case EAT:
+                    getInventory().getRandom(Constants.food).interact();
+                break;
+                case SLEEP:
+                Calculations.random(1717, 2017);
+                    break;
         }
-        return Calculations.random(950, 1050);
+        return Calculations.random(977, 1177);
         }
         
 @Override
 	public void onPaint(Graphics g){
-            g.setColor(Color.cyan);
+            g.setColor(Color.WHITE);
 			g.drawString("Runtime: " + timer.formatTime(), 10, 35);
-                        g.drawString("Fishing exp (p/h): " + getSkillTracker().getGainedExperience(Skill.FISHING) + "(" + getSkillTracker().getGainedExperiencePerHour(Skill.FISHING) + ")", 10, 65); //65
-                        g.drawString("Agility exp (p/h): " + getSkillTracker().getGainedExperience(Skill.AGILITY) + "(" + getSkillTracker().getGainedExperiencePerHour(Skill.AGILITY) + ")", 10, 80); //80
-                        g.drawString("Strength exp (p/h): " + getSkillTracker().getGainedExperience(Skill.STRENGTH) + "(" + getSkillTracker().getGainedExperiencePerHour(Skill.STRENGTH) + ")", 10, 95); //65
-                        g.drawString("Fish gained (p/h): " + fish_count + "(" + timer.getHourlyRate(fish_count) + ")", 10, 110);
-                                            
-                       
-}}
+                        g.drawString("Kills: " + kills, 10, 50);
+                        g.drawString("Hitpoints (p/h): " + getSkillTracker().getGainedExperience(Skill.HITPOINTS) + "(" + getSkillTracker().getGainedExperiencePerHour(Skill.HITPOINTS) + ")", 10, 65);
+                        if (Strength) {
+                        g.drawString("Strength exp (p/h): " + getSkillTracker().getGainedExperience(Skill.STRENGTH) + "(" + getSkillTracker().getGainedExperiencePerHour(Skill.STRENGTH) + ")", 10, 80);
+                        } else {
+                        if (Attack) {
+                        g.drawString("Attack exp (p/h): " + getSkillTracker().getGainedExperience(Skill.ATTACK) + "(" + getSkillTracker().getGainedExperiencePerHour(Skill.ATTACK) + ")", 10, 95);
+                        } else {
+                       if (Defence) {
+                        g.drawString("Defence exp (p/h): " + getSkillTracker().getGainedExperience(Skill.DEFENCE) + "(" + getSkillTracker().getGainedExperiencePerHour(Skill.DEFENCE) + ")", 10, 110);
+                            } else {
+                        if (Magic) {
+                        g.drawString("Magic exp (p/h): " + getSkillTracker().getGainedExperience(Skill.MAGIC) + "(" + getSkillTracker().getGainedExperiencePerHour(Skill.MAGIC) + ")", 10, 125);
+                        } else {
+                        if (Range) {
+                        g.drawString("Ranged exp (p/h): " + getSkillTracker().getGainedExperience(Skill.RANGED) + "(" + getSkillTracker().getGainedExperiencePerHour(Skill.RANGED) + ")", 10, 140);
+        }}}}}}}
 

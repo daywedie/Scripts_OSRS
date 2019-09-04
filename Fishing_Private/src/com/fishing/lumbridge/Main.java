@@ -1,6 +1,7 @@
-package com.fishing.barbarian;
+package com.fishing.lumbridge;
 
 
+import com.fishing.barbarian.*;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.util.Random;
@@ -23,7 +24,7 @@ import org.dreambot.api.wrappers.widgets.message.Message;
  *
  * @author t7emon
  */
-@ScriptManifest(author = "T7emon", name = "Fishing_Private", version = 1.0, description = "Barbarian Fishing", category = Category.FISHING)
+@ScriptManifest(author = "T7emon", name = "Fishing_Lumbridge", version = 1.0, description = "Fish Shrimps or Salmon", category = Category.FISHING)
 
 public class Main extends AbstractScript {
     
@@ -33,8 +34,6 @@ public class Main extends AbstractScript {
             public void init() {
                timer = new Timer();
                getSkillTracker().start(Skill.FISHING);
-               getSkillTracker().start(Skill.AGILITY);
-               getSkillTracker().start(Skill.STRENGTH);
                log("Initialized");
             
         }
@@ -49,7 +48,7 @@ public class Main extends AbstractScript {
         
             @Override
 public void onMessage(Message msg) {
-	if (msg.getMessage().contains("You catch a leaping trout.") || msg.getMessage().contains("You catch a leaping salmon.") || msg.getMessage().contains("You catch a leaping sturgeon.")) {
+	if (msg.getMessage().contains("You catch a trout.") || msg.getMessage().contains("You catch a salmon") || msg.getMessage().contains("You catch some shrimps.")) {
            fish_count++;
         }
 }
@@ -60,18 +59,14 @@ public void onMessage(Message msg) {
                 
         private State getState() {
             
-            if (!getInventory().contains(Constants.Barbarian_rod) || !getInventory().contains(Constants.Feathers)) {
-                log("You need a Barbarian rod & Feathers to use this script!");
-                this.stop();
-            }
-            
               if (getDialogues().inDialogue()) {
                      getDialogues().clickContinue();
                      return State.FISH;
                }
-              if (getInventory().count(Constants.Leaping_trout) > new Random().nextInt(6 + 1) + 10 
-                || getInventory().count(Constants.Leaping_salmon) > new Random().nextInt(6 + 1) + 10 
-                || getInventory().count(Constants.Leaping_sturgeon) > new Random().nextInt(6 + 1) + 10 
+              if (getInventory().count(Constants.Raw_trout) > new Random().nextInt(6 + 1) + 10 
+                || getInventory().count(Constants.Raw_salmon) > new Random().nextInt(6 + 1) + 10 
+                 || getInventory().count(Constants.Raw_shrimps) > new Random().nextInt(6 + 1) + 10 
+                //|| getInventory().count(Constants.Leaping_sturgeon) > new Random().nextInt(6 + 1) + 10 
                 || getInventory().isFull()) {
               return State.DROP;
               }
@@ -83,13 +78,13 @@ public void onMessage(Message msg) {
             switch (getState()) {
                 case FISH:
                     NPC Fishing_spot = getNpcs().closest("Fishing spot");
-                     if (!getLocalPlayer().isInteracting(Fishing_spot) && Fishing_spot.interactForceRight("Use-rod")) {
+                     if (!getLocalPlayer().isInteracting(Fishing_spot) && Fishing_spot.interactForceRight("Net")) {
                         sleepUntil(()-> !getLocalPlayer().isInteracting(Fishing_spot), 240000);
                     }
                 break;
                 case DROP:
-                    getInventory().dropAllExcept(Constants.Barbarian_rod, Constants.Feathers);
-                     sleepUntil(()-> !getInventory().contains(Constants.Leaping_trout) || !getInventory().contains(Constants.Leaping_salmon) || !getInventory().contains(Constants.Leaping_sturgeon) , 240000);
+                    getInventory().dropAllExcept(Constants.fly_fishing_rod, Constants.Feathers, Constants.Small_fishing_net);
+                     sleepUntil(()-> !getInventory().contains(Constants.Raw_trout) || !getInventory().contains(Constants.Raw_salmon) || !getInventory().contains(Constants.Raw_shrimps) || !getInventory().contains(Constants.Raw_anchovies), 240000);
                 break;
         }
         return Calculations.random(950, 1050);
@@ -100,8 +95,6 @@ public void onMessage(Message msg) {
             g.setColor(Color.cyan);
 			g.drawString("Runtime: " + timer.formatTime(), 10, 35);
                         g.drawString("Fishing exp (p/h): " + getSkillTracker().getGainedExperience(Skill.FISHING) + "(" + getSkillTracker().getGainedExperiencePerHour(Skill.FISHING) + ")", 10, 65); //65
-                        g.drawString("Agility exp (p/h): " + getSkillTracker().getGainedExperience(Skill.AGILITY) + "(" + getSkillTracker().getGainedExperiencePerHour(Skill.AGILITY) + ")", 10, 80); //80
-                        g.drawString("Strength exp (p/h): " + getSkillTracker().getGainedExperience(Skill.STRENGTH) + "(" + getSkillTracker().getGainedExperiencePerHour(Skill.STRENGTH) + ")", 10, 95); //65
                         g.drawString("Fish gained (p/h): " + fish_count + "(" + timer.getHourlyRate(fish_count) + ")", 10, 110);
                                             
                        

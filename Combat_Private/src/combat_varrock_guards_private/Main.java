@@ -1,10 +1,14 @@
-package com.fishing.barbarian;
+package combat_varrock_guards_private;
 
 
+import combat_cow_killer_private.*;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.util.Random;
 import org.dreambot.api.methods.Calculations;
+import org.dreambot.api.methods.container.impl.bank.BankLocation;
+import org.dreambot.api.methods.map.Area;
+import org.dreambot.api.methods.map.Tile;
 import org.dreambot.api.methods.skills.Skill;
 import org.dreambot.api.script.AbstractScript;
 import org.dreambot.api.script.Category;
@@ -23,87 +27,157 @@ import org.dreambot.api.wrappers.widgets.message.Message;
  *
  * @author t7emon
  */
-@ScriptManifest(author = "T7emon", name = "Fishing_Private", version = 1.0, description = "Barbarian Fishing", category = Category.FISHING)
+@ScriptManifest(author = "T7emon", name = "Varrock_Guards_Killer", version = 1.0, description = "Kill Varrock Guards at Varrock palace.", category = Category.COMBAT)
 
 public class Main extends AbstractScript {
     
     private Timer timer;
-    private int fish_count = 0;
+    private int kills = 0;
+    private int ate_food = 0;
+    private int food_in_bank = 0;
+    boolean banking = false;
     
             public void init() {
                timer = new Timer();
-               getSkillTracker().start(Skill.FISHING);
-               getSkillTracker().start(Skill.AGILITY);
+               getSkillTracker().start(Skill.HITPOINTS);
                getSkillTracker().start(Skill.STRENGTH);
+               getSkillTracker().start(Skill.ATTACK);
+               getSkillTracker().start(Skill.DEFENCE);
+               getSkillTracker().start(Skill.MAGIC);
+               getSkillTracker().start(Skill.RANGED);
                log("Initialized");
-            
         }
 
     @Override
 	public void onStart() {
             init();
-		log("Welcome to Fishing Bot by T7emon.");
+		log("Welcome to Varrock Guards Killer Bot by T7emon.");
 		log("If you experience any issues while running this script please report them to me on the forums.");
-		log("Enjoy the script, gain some Fishing levels!.");
+		log("Enjoy the script, gain some Combat levels!.");
         }
         
             @Override
 public void onMessage(Message msg) {
-	if (msg.getMessage().contains("You catch a leaping trout.") || msg.getMessage().contains("You catch a leaping salmon.") || msg.getMessage().contains("You catch a leaping sturgeon.")) {
-           fish_count++;
+	if (msg.getMessage().contains("There is no ammo left in your quiver.")) {
+            log("There is no ammo left in your quiver.");
+            getWalking().walkExact(new Tile(3212, 3438, 0));
+            sleep(5000);
+           this.stop();
         }
+}
+
+        /*
+         * Is in area? wether true or false
+            */
+    private boolean inArea(Area area){ 
+    if(area.contains(getLocalPlayer().getTile())){
+        return true;
+    }return false;
 }
        
         	private enum State {
-               FISH, DROP
+               BANK, WALK, EAT, FIGHT, SLEEP
 	};
                 
         private State getState() {
             
-            if (!getInventory().contains(Constants.Barbarian_rod) || !getInventory().contains(Constants.Feathers)) {
-                log("You need a Barbarian rod & Feathers to use this script!");
-                this.stop();
+            if (!getInventory().contains(Constants.food) && Constants.food_enabled) {
+                log("You ran out of food.. Walking to bank...");
+                banking = true;
+                return State.BANK;
             }
             
               if (getDialogues().inDialogue()) {
                      getDialogues().clickContinue();
-                     return State.FISH;
                }
-              if (getInventory().count(Constants.Leaping_trout) > new Random().nextInt(6 + 1) + 10 
-                || getInventory().count(Constants.Leaping_salmon) > new Random().nextInt(6 + 1) + 10 
-                || getInventory().count(Constants.Leaping_sturgeon) > new Random().nextInt(6 + 1) + 10 
-                || getInventory().isFull()) {
-              return State.DROP;
+              
+               if (!inArea(Constants.Varrock_palace) && !banking){
+                   return State.WALK;
+               }
+                            
+              if (getLocalPlayer().getHealthPercent() < 40) {
+                  return State.EAT;
               }
-            return State.FISH;
+              
+              if (inArea(Constants.Varrock_palace)) {
+                  //log("In Varrock palace area!");
+              if (getNpcs().closest(Constants.NPC).isOnScreen() && !getNpcs().closest(Constants.NPC).isInCombat() && !getLocalPlayer().isInCombat() && getLocalPlayer().getHealthPercent() >= 40) {
+                  sleep(Calculations.random(1017, 2117));
+                  return State.FIGHT;
+              }}
+            
+            return State.SLEEP;
         }
         
 	@Override
 	public int onLoop() {
             switch (getState()) {
-                case FISH:
-                    NPC Fishing_spot = getNpcs().closest("Fishing spot");
-                     if (!getLocalPlayer().isInteracting(Fishing_spot) && Fishing_spot.interactForceRight("Use-rod")) {
-                        sleepUntil(()-> !getLocalPlayer().isInteracting(Fishing_spot), 240000);
-                    }
+                
+                case BANK:
+                    getBank().open(BankLocation.VARROCK_WEST);
+                     sleepUntil(() -> getBank().isOpen(), Calculations.random(2807, 3917));
+                    if (getBank().isOpen() && !getBank().contains(Constants.food) ) {
+                    log("No food in bank! Stopping...");
+                    this.stop();
+                    } else {
+                     if (getBank().isOpen()) {
+                         getBank().depositAllItems();
+                         sleepUntil(() -> getInventory().fullSlotCount() == 0, 5000);
+                     getBank().withdraw(Constants.food, Constants.food_amount);
+                     sleepUntil(() -> getInventory().count(Constants.food) == Constants.food_amount, 5000);
+                     food_in_bank = getBank().count(Constants.food);
+                     getBank().close();                
+                banking = false;
+                 }}
                 break;
-                case DROP:
-                    getInventory().dropAllExcept(Constants.Barbarian_rod, Constants.Feathers);
-                     sleepUntil(()-> !getInventory().contains(Constants.Leaping_trout) || !getInventory().contains(Constants.Leaping_salmon) || !getInventory().contains(Constants.Leaping_sturgeon) , 240000);
+                case WALK:
+                    getWalking().walk(new Tile(3212, 3460, 0));
+                    log("Walking to Varrock palace...");
+                    sleep(Calculations.random(2217, 4117));
+                break;
+                case FIGHT:
+                NPC npc = getNpcs().closest(Constants.NPC);
+                
+                 int random = new Random().nextInt(1000);
+                 log("Random Number: " + random);
+                 
+                if (random <= 800 && npc.interact()) {
+                    log("Attacking " + npc.getName());
+                    sleepUntil(() -> !npc.isDrawMinimapDot(), 10000);
+                    kills++;
+                } else {
+                    if (random > 800 && npc.interactForceRight("Attack")) {
+                    log("Attacking " + npc.getName());
+                    sleepUntil(() -> !npc.isDrawMinimapDot(), 10000);
+                    kills++;
+                    }
+                }
+                break;
+                case EAT:
+                    getInventory().getRandom(Constants.food).interact();
+                    log("Eating: " + Constants.food);
+                    ate_food++;
+                    sleep(Calculations.random(1277, 1407));
+                break;
+                case SLEEP:
+                Calculations.random(1717, 5017);
                 break;
         }
-        return Calculations.random(950, 1050);
+        return Calculations.random(977, 1177);
         }
         
 @Override
 	public void onPaint(Graphics g){
-            g.setColor(Color.cyan);
+            g.setColor(Color.WHITE);
 			g.drawString("Runtime: " + timer.formatTime(), 10, 35);
-                        g.drawString("Fishing exp (p/h): " + getSkillTracker().getGainedExperience(Skill.FISHING) + "(" + getSkillTracker().getGainedExperiencePerHour(Skill.FISHING) + ")", 10, 65); //65
-                        g.drawString("Agility exp (p/h): " + getSkillTracker().getGainedExperience(Skill.AGILITY) + "(" + getSkillTracker().getGainedExperiencePerHour(Skill.AGILITY) + ")", 10, 80); //80
-                        g.drawString("Strength exp (p/h): " + getSkillTracker().getGainedExperience(Skill.STRENGTH) + "(" + getSkillTracker().getGainedExperiencePerHour(Skill.STRENGTH) + ")", 10, 95); //65
-                        g.drawString("Fish gained (p/h): " + fish_count + "(" + timer.getHourlyRate(fish_count) + ")", 10, 110);
-                                            
-                       
-}}
+                        g.drawString("Kills: " + kills, 10, 50);
+                        g.drawString("Ate Food: " + ate_food, 10, 65);
+                        g.drawString("Food left in bank: " + food_in_bank, 10, 80);
+                        g.drawString("Hitpoints (p/h): " + getSkillTracker().getGainedExperience(Skill.HITPOINTS) + "(" + getSkillTracker().getGainedExperiencePerHour(Skill.HITPOINTS) + ")", 10, 95);
+                        g.drawString("Strength exp (p/h): " + getSkillTracker().getGainedExperience(Skill.STRENGTH) + "(" + getSkillTracker().getGainedExperiencePerHour(Skill.STRENGTH) + ")", 10, 110);
+                        g.drawString("Attack exp (p/h): " + getSkillTracker().getGainedExperience(Skill.ATTACK) + "(" + getSkillTracker().getGainedExperiencePerHour(Skill.ATTACK) + ")", 10, 125);
+                        g.drawString("Defence exp (p/h): " + getSkillTracker().getGainedExperience(Skill.DEFENCE) + "(" + getSkillTracker().getGainedExperiencePerHour(Skill.DEFENCE) + ")", 10, 140);
+                        g.drawString("Magic exp (p/h): " + getSkillTracker().getGainedExperience(Skill.MAGIC) + "(" + getSkillTracker().getGainedExperiencePerHour(Skill.MAGIC) + ")", 10, 155);
+                        g.drawString("Ranged exp (p/h): " + getSkillTracker().getGainedExperience(Skill.RANGED) + "(" + getSkillTracker().getGainedExperiencePerHour(Skill.RANGED) + ")", 10, 170);
+        }}
 

@@ -28,6 +28,7 @@ import org.dreambot.api.wrappers.widgets.message.Message;
 public class Main extends AbstractScript {
     
     private Timer timer;
+    NPC Fishing_spot;
     private int fish_count = 0;
     
             public void init() {
@@ -42,7 +43,7 @@ public class Main extends AbstractScript {
     @Override
 	public void onStart() {
             init();
-		log("Welcome to Fishing Bot by T7emon.");
+		log("Welcome to Barbarian Fishing Bot by T7emon.");
 		log("If you experience any issues while running this script please report them to me on the forums.");
 		log("Enjoy the script, gain some Fishing levels!.");
         }
@@ -82,14 +83,17 @@ public void onMessage(Message msg) {
 	public int onLoop() {
             switch (getState()) {
                 case FISH:
-                    NPC Fishing_spot = getNpcs().closest("Fishing spot");
+                     Fishing_spot = getNpcs().closest("Fishing spot");
                      if (!getLocalPlayer().isInteracting(Fishing_spot) && Fishing_spot.interactForceRight("Use-rod")) {
                         sleepUntil(()-> !getLocalPlayer().isInteracting(Fishing_spot), 240000);
                     }
                 break;
                 case DROP:
-                    getInventory().dropAllExcept(Constants.Barbarian_rod, Constants.Feathers);
+                   // getInventory().dropAllExcept(Constants.Barbarian_rod, Constants.Feathers);
+                     getInventory().dropAll(Item -> Item != null && Item.getName().contains("Leaping"));
                      sleepUntil(()-> !getInventory().contains(Constants.Leaping_trout) || !getInventory().contains(Constants.Leaping_salmon) || !getInventory().contains(Constants.Leaping_sturgeon) , 240000);
+                     sleep(Calculations.random(977, 1477));
+                     getMouse().click(Fishing_spot);
                 break;
         }
         return Calculations.random(950, 1050);

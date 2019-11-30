@@ -17,6 +17,7 @@ import org.dreambot.api.methods.container.impl.bank.BankLocation;
 import org.dreambot.api.methods.container.impl.bank.BankType;
 import org.dreambot.api.methods.dialogues.Dialogues;
 import org.dreambot.api.methods.filter.impl.NameFilter;
+import org.dreambot.api.methods.map.Area;
 import org.dreambot.api.methods.map.Tile;
 import org.dreambot.api.methods.prayer.Prayer;
 import org.dreambot.api.methods.skills.Skill;
@@ -35,8 +36,6 @@ import org.dreambot.api.wrappers.widgets.message.Message;
 public class Main extends AbstractScript {
     
     private Timer timer;
-    private String status;
-    private int drink;
     boolean entered = false;
     boolean dreamCreated = false;
     boolean banking = false;
@@ -52,6 +51,15 @@ public class Main extends AbstractScript {
             
         }
 
+                    /*
+         * Is in area? wether true or false
+            */
+    private boolean inArea(Area area){ 
+    if(area.contains(getLocalPlayer().getTile())){
+        return true;
+    }return false;
+}
+    
      private void bank() {
            banking = true;
            getBank().open(BankLocation.YANILLE);
@@ -81,9 +89,7 @@ log("Should Bank...");
 	}
 }
     private void createDream() {
-        if (!entered && !dreamCreated && !banking) {
-        getWalking().walk(Constants.NMZ_LOCATION.getRandomizedTile());
-        sleep(7000); //lag?
+        if (inArea(Constants.NMZ_Yanille_Area) && !entered && !dreamCreated && !banking) {
         NPC Dominic = getNpcs().closest("Dominic Onion");
                             Dominic.interact("Dream");
                             sleep(Calculations.random(6000, 7500));
@@ -119,17 +125,17 @@ private void enterDream() {
 	}
 
 	private enum State {
-               BANK, DREAM, ENTER, DRINK_OVERLOAD, PROTECT_FROM_MELEE, DRINK_PRAYER_POT, SLEEP
+               BANK, WALK, DREAM, ENTER, DRINK_OVERLOAD, PROTECT_FROM_MELEE, DRINK_PRAYER_POT, SLEEP
 	};
 
 	private State getState() {
             //if (getSkillTracker().getGainedExperience(Skill.STRENGTH) > 6500000) {
                    //if (getSkills().getRealLevel(Skill.HITPOINTS) == 99 || timer.formatTime().toLowerCase().contains("04:00:15")) {
-                    if (getSkills().getExperience(Skill.HITPOINTS) >= 13000020 || timer.formatTime().toLowerCase().contains("04:00:15")) {
-                    log("Time to Stop...");
-                sleep(3000);
-                this.stop();
-            }
+                   // if (getSkills().getExperience(Skill.HITPOINTS) >= 13000020 || timer.formatTime().toLowerCase().contains("04:00:15")) {
+                    //log("Time to Stop...");
+                //sleep(3000);
+                //this.stop();
+            //}
             if (getLocalPlayer().isInCombat()) {
                 dreamCreated = true;
                 entered = true;
@@ -146,7 +152,11 @@ private void enterDream() {
                 log("0 Hp");
                 return State.BANK;
             }
-        if (!dreamCreated && !banking) {
+            if (!inArea(Constants.NMZ_Yanille_Area) && !banking && !dreamCreated && !entered) {
+                log("State = WALK");
+                return State.WALK;
+            }
+        if (inArea(Constants.NMZ_Yanille_Area) && !dreamCreated && !banking) {
                 log("State = DREAM");
            return State.DREAM;
         }
@@ -183,6 +193,11 @@ private void enterDream() {
           		case DREAM:
                         createDream();
                             break;
+                        case WALK:
+                        if (getWalking().walk(Constants.NMZ_Location_Tile)) {
+                        sleepUntil(() -> inArea(Constants.NMZ_Yanille_Area), 3700);
+                        }
+                        break;
 		case ENTER:
                 enterDream();
                 break;

@@ -5,15 +5,19 @@
  */
 package nmz_private;
 
+import org.dreambot.api.methods.map.Area;
 import org.dreambot.api.methods.map.Tile;
 
 /**
  *
- * @author cyborg
+ * @author T7emon
  */
+
 public class Constants {
     
-        public static Tile NMZ_LOCATION = new Tile(2609, 3115, 0);
+        public static Tile NMZ_Location_Tile = new Tile(2608, 3115, 0);
+        public static Area NMZ_Yanille_Area = new Area(2610, 3111, 2601, 3118, 0);
+        
         public static boolean Prayer = true;
         public static int Prayer_potion_4 = 2434;
         public static int Overload_4 = 11730;

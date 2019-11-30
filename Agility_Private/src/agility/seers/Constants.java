@@ -16,7 +16,7 @@ import org.dreambot.api.wrappers.items.GroundItem;
  */
 public class Constants {
     
-        public static int food = 379; //Food to take from bank || 385 = Shark, 379 = Lobster
+        public static int food = 361; //Food to take from bank || 385 = Shark, 379 = Lobster, 361 = Tuna
         public static int food_amount = 5; //Amout of food to take from bank
         public static int stamina = 343;
          public static Tile WALL_LOCATION = new Tile(2729, 3488, 0);

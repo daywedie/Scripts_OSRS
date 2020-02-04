@@ -69,6 +69,10 @@ public class Main extends AbstractScript {
           bank.interact();
           //etBank().open(BankLocation.GRAND_EXCHANGE);
           sleepUntil(() -> getBank().isOpen(), 3000);
+          if (!getBank().contains(Constants.iron_ore)) {
+              log("Ran out of Ores");
+              this.stop();
+          }
           //getBank().deposit(Constants.iron_bar, 27);
           getBank().depositAllExcept(Constants.nature_rune);
           sleepUntil(() -> getInventory().emptySlotCount() >= 26, 3000);

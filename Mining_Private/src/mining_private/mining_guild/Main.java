@@ -58,9 +58,7 @@ public class Main extends AbstractScript {
     */
 @Override
 public void onMessage(Message msg) {
-	if (msg.getMessage().contains("Your inventory is too full to hold any more roots.")) {
-            //log("STATUS = FLETCH");
-            //fletching = true;
+	if (msg.getMessage().contains("")) {
         }
 }
     
@@ -77,14 +75,11 @@ public void onMessage(Message msg) {
 	};
 
 	private State getState() {
-        //if (mining_private.Constants.ironOre.distance(getLocalPlayer().getTile()) == 1) {
-        //mining = true;  
-   // }
             
-        if (getInventory().count(mining_private.mining_guild.Constants.ore) > new Random().nextInt(6 + 1) + 10 || getInventory().isFull()) {
+        if (getInventory().count(mining_private.mining_guild.Constants.ore) > new Random().nextInt(7 + 1) + 10 || getInventory().isFull()) {
         return State.DROP;
         } else {
-      if (  mining_private.mining_guild.Constants.ironOre.distance(getLocalPlayer().getTile()) < 2) {
+      if (mining_private.mining_guild.Constants.Iron_Rocks.distance(getLocalPlayer().getTile()) < 2) {
      return State.MINE;
         }}
                 
@@ -97,25 +92,32 @@ public void onMessage(Message msg) {
       /*****************************************************************************************************************************/
 		switch (getState()) {                  
             case MINE:
-            GameObject ore1 = getGameObjects().getTopObjectOnTile(new Tile(3028, 9720, 0)); //7455 //7468
-            GameObject ore2 = getGameObjects().getTopObjectOnTile(new Tile(3029, 9721, 0)); //7455 
-            GameObject ore3 = getGameObjects().getTopObjectOnTile(new Tile(3030, 9720, 0)); //7455
-            if (ore1 != null && ore1.getID() == 11364) { 
-                ore1.interact();
-              sleepUntil(()-> ore1.getID() == 11390, 1200);
+            GameObject Left_Rock;
+            GameObject Middle_Rock;
+            GameObject Right_Rock;
+           // int random = new Random().nextInt(5000);
+            //log("Random Number = " + random);
+          GameObject Rock1 = getGameObjects().getTopObjectOnTile(new Tile(3028, 9720, 0)); //7455 //7468
+          GameObject Rock2 = getGameObjects().getTopObjectOnTile(new Tile(3029, 9721, 0)); //7455 
+          GameObject Rock3 = getGameObjects().getTopObjectOnTile(new Tile(3030, 9720, 0)); //7455
+              
+           if (Rock1 != null && Rock1.getID() == 11364) { 
+                Rock1.interact();
+              sleepUntil(()-> Rock1.getID() == 11390, 1200);
               ore_count++;
             } else {
-                if (ore1.getID() == 11390 && ore2 != null && ore2.getID() == 11364) {
-                    ore2.interact();
-                   sleepUntil(()-> ore2.getID() == 11390, 1200);
-                   ore_count++;
+                if (Rock1.getID() == 11390 && Rock2 != null && Rock2.getID() == 11364) {
+                    Rock2.interact();
+                   sleepUntil(()-> Rock2.getID() == 11390, 1200);
+                   ore_count++;               
                } else {
-                    if (ore2.getID() == 11390 && ore3 != null && ore3.getID() == 11364) {
-                        ore3.interact();
-                        sleepUntil(()-> ore3.getID() == 11390, 1200);
+                    if (Rock2.getID() == 11390 && Rock3 != null && Rock3.getID() == 11364) {
+                   // if (random >= 4500)
+                        Rock3.interact();
+                        sleepUntil(()-> Rock3.getID() == 11390, 1200);
                         ore_count++;
-                    }
                 }}
+           }
                 break;
                case DROP:
                    getInventory().dropAll(mining_private.mining_guild.Constants.ore);

@@ -1,16 +1,10 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package agility.falador;
 
 import org.dreambot.api.methods.map.Area;
 import org.dreambot.api.methods.map.Tile;
 
-/**
- *
- * @author t7emon
+/*
+ * @author T7emon, Tear x, Null x, T7x
  */
 public class Constants {
     

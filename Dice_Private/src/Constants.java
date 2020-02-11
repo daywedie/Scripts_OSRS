@@ -18,8 +18,12 @@ import org.dreambot.api.wrappers.items.Item;
  */
 public class Constants {
     
-         public static int min_bet_amount = 100000; //K
+         public static int mini_bet_amount = 100000; //K
          public static int chance_amount = 55; //x2
+         
+         
+         
+         
          
        /*
          * Is in area? wether true or false

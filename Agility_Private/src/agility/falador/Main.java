@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package agility.falador;
 
 import java.awt.Color;
@@ -23,9 +18,8 @@ import org.dreambot.api.wrappers.interactive.GameObject;
 import org.dreambot.api.wrappers.items.GroundItem;
 import org.dreambot.api.wrappers.widgets.message.Message;
 
-/**
- *
- * @author t7emon
+/*
+ * @author T7emon, Tear x, Null x, T7x
  */
 @ScriptManifest(author = "T7emon", name = "Agility_Falador", version = 1.0, description = "Agility Falador", category = Category.AGILITY)
 
@@ -36,7 +30,6 @@ public class Main extends AbstractScript {
     boolean banking;
     private int laps = 0;
     private int marks = 0;
-    //private GroundItem mark = getGroundItems().closest("Mark of grace");
     private boolean entered;
     private boolean roofs = true;
     

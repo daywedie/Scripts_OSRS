@@ -1,13 +1,18 @@
 
+import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+import static org.dreambot.api.Client.getClient;
 import org.dreambot.api.methods.Calculations;
 import org.dreambot.api.methods.map.Area;
+import org.dreambot.api.methods.map.Tile;
 import org.dreambot.api.methods.skills.Skill;
+import org.dreambot.api.methods.widget.Widget;
 import org.dreambot.api.script.AbstractScript;
 import org.dreambot.api.script.Category;
 import org.dreambot.api.script.ScriptManifest;
@@ -28,18 +33,16 @@ import org.dreambot.api.wrappers.widgets.message.Message;
         description = "Dicer!?", 
         category = Category.MONEYMAKING)
 
-public class Main extends AbstractScript implements AdvancedMessageListener {
+public class Main extends AbstractScript {
 
     private Timer timer;
+    private Timer tradeTimer;
     private String trader;
-    private boolean won;
     private int random;
-    private boolean payOut;
+    private boolean payout;
     private boolean roll;
-    private String currentTrader;
     private int coinsAmount;
-    private Item item;
-     List<String> traderList = new ArrayList<String>();
+    //List<String> traderList = new ArrayList<String>();
 
     @Override
 	public void onStart() {
@@ -47,22 +50,19 @@ public class Main extends AbstractScript implements AdvancedMessageListener {
             log("Initialized");
 	    log("Welcome to Dice Bot by Null x.");
         }
-            @Override
-public void onMessage(Message msg) {
-}
+        
          @Override
-        public void onTradeMessage(Message msg) {
-        if (msg.getMessage().contains("wishes to trade with you."))
+        public void onMessage(Message msg) {
+       if (msg.getMessage().contains("wishes to trade with you.")) {
+            log("Trader Detected");
              trader = msg.getUsername();
-        getTrade().tradeWithPlayer(trader);
-      for (int i = 0; i < 51; i++) {
-           traderList.add(trader + i);
-}}
-
-public void sendMessage(String msg) {
-    getKeyboard().type(msg, true);
+             tradeTimer = new Timer();
+        }}
+        
+void sendMessage(String message) {
+    getKeyboard().type(message);
+ getMouse().getMouseSettings().setWordsPerMinute(300);
 }
-
                private enum State {
                ADVERTISE,
                TRADE,
@@ -71,19 +71,20 @@ public void sendMessage(String msg) {
 	};
                 
         private State getState() {
-            
-          if (getTrade().isOpen(1)) {
-          return State.TRADE;
+            Tile cwCenterTile = new Tile(2441, 3087, 0);
+            if (!getLocalPlayer().getTile().equals(cwCenterTile)) {
+                getWalking().walk(cwCenterTile);
             }
-          
-           
+                while (trader != null && !roll && !payout) {
+                return State.TRADE;
+            }
+                    
           if (roll) {
               return State.ROLL;
           }
-          if (payOut) {
+          if (payout) {
               return State.PAY;
           }
-            
             return State.ADVERTISE;
         }
         
@@ -92,58 +93,88 @@ public void sendMessage(String msg) {
             switch (getState()) {
                 case ADVERTISE:
                 log("State = Advertising");
-                //getKeyboard().type("Bet "+ Constants.chance_amount+"x2", true);
-                sleep(Calculations.random(1200, 1700));
+                sendMessage("red:shake:"+"Verified host | " + "100k min | " + " Roll " + Constants.chance_amount + "+ " + " | " + "("+getLocalPlayer().getName()+")" + " " + Constants.getCurrentTimeString());
+                 //sendMessage("red:shake:"+"Verified host | " + "100k min | " + "Roll " + Constants.chance_amount + "+ " + " | " + "("+getLocalPlayer().getName()+")" + " " + Constants.getCurrentTimeString());
+                //getKeyboard().type("red:wave:"+"Verified host | " + "100k min | " + "Roll " + Constants.chance_amount + "+ " + " | " + getLocalPlayer().getName() + " " +Constants.getCurrentTimeString(), true);
+                sleep(Calculations.random(1300, 1700));
                 break;
                 case TRADE:
                 log("State = TRADE");
+               getTrade().tradeWithPlayer(trader);
+               sleepUntil(() -> getTrade().isOpen(1), 5000);
+                    if (getTrade().isOpen() && tradeTimer.elapsed() >= 15000) {
+                getTrade().declineTrade(1);
+                trader = null;
+                tradeTimer.reset();
+                sendMessage("red:shake:" + trader + " took too long.. decling...");
+                log("Trader took too long..");
+            } else {
+               if (getTrade().isOpen(1)) {
                 Item[] traderItems = getTrade().getTheirItems();
                 if (traderItems != null) {
                 for (Item item : traderItems) {
-                    if (!item.getName().equals("coins") && item.getAmount() < Constants.mini_bet_amount) {
-                        log("Decline trade..");
-                        getTrade().declineTrade();
-                    } else {
-                    if (item.getName().equalsIgnoreCase("coins") && item.getAmount() >= Constants.mini_bet_amount) {
+                    //sleepUntil(() -> item.getName().equals("coins") && item.getAmount() >= Constants.min_bet_amount, 10000);
+                    if (item.getName().equalsIgnoreCase("coins") && item.getAmount() >= Constants.min_bet_amount) {
                         getTrade().acceptTrade(1);
-                        sleep(Calculations.random(3000, 5000));
+                       sleepUntil(() -> getTrade().isOpen(2), 5000);
                          if (getTrade().isOpen(2)) {
-                        currentTrader = getTrade().getTradingWith();
                         coinsAmount = item.getAmount();
                         getTrade().acceptTrade(2);
-                    }
-                }}
-                }}
+                       getKeyboard().type("green:shake:"+trader + " Has placed a bet of " + coinsAmount+"K " + Constants.getCurrentTimeString());
+                       getMouse().getMouseSettings().setWordsPerMinute(300);
+                        sleep(Calculations.random(1000, 1200));
+                        if (!getTrade().isOpen(2)) {       
+                        roll = true;
+                    } else {
+                        if (!getTrade().isOpen()) {
+                        trader = null;
+                         } else {
+                        if (!item.getName().equals("coins") && item.getAmount() < Constants.min_bet_amount) {
+                        log("Decline trade..");
+                        getTrade().declineTrade();
+                        trader = null;
+                }}}}}}
+                }}}
                 break;
                 case ROLL:
                 log("State = Roll");
-                //sendMessage("Rolling...");
+                sendMessage("Rolling...");
+                sleep(Calculations.random(1000, 1200));
                 random = new Random().nextInt(100);
+                log("Rolled : " + random);
                 if (random < Constants.chance_amount) {
-                    won = false;
+                  sendMessage("red:shake:"+trader + " has LOST with a roll of ("+random+")");
+                  sleep(Calculations.random(1000, 1200));
+                    payout = false;
+                    roll = false;
+                    trader = null;
                 } else {
                     if (random == Constants.chance_amount) {
                      random = new Random().nextInt(100);
                     } else {
                         if (random > Constants.chance_amount) {
-                            won = true;
+                           sendMessage("green:shake:"+trader + " has WON with a roll of ("+random+")");
+                            sleep(Calculations.random(1000, 1200));
+                            payout = true;
+                            roll = false;
                         }
                     }
                 }
                 //sendMessage(currentTrader + "Rolled " + random + "("+"win: "+won+")");
-                if (won) {
-                    payOut = true;
-                }
                 break;
                 case PAY:
                     log("State = PAY");
-                    getTrade().tradeWithPlayer(currentTrader);
+                    getTrade().tradeWithPlayer(trader);
                     sleepUntil(() -> getTrade().isOpen(), 10000);
                     if (getTrade().isOpen(1)) {
                         getTrade().addItem(995, coinsAmount * 2);
                         getTrade().acceptTrade(1);
+                        sleepUntil(() -> getTrade().isOpen(2), 5000);
                         if (getTrade().isOpen(2)) {
                             getTrade().acceptTrade(2);
+                            sendMessage("green:"+trader + " has been paid " + coinsAmount);
+                            payout = false;
+                            trader = null;
                         }
                     }
                 break;
@@ -163,40 +194,5 @@ public void sendMessage(String msg) {
                                             
                        
 }
-
-    @Override
-    public void onAutoMessage(Message msg) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public void onPrivateInfoMessage(Message msg) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public void onClanMessage(Message msg) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public void onGameMessage(Message msg) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public void onPlayerMessage(Message msg) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public void onPrivateInMessage(Message msg) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public void onPrivateOutMessage(Message msg) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
 }
 

@@ -1,7 +1,12 @@
 import java.awt.Color;
 import java.awt.Graphics;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.dreambot.api.methods.Calculations;
 import org.dreambot.api.methods.map.Area;
 import org.dreambot.api.methods.map.Tile;
@@ -37,7 +42,6 @@ public class Main extends AbstractScript {
     private boolean payout;
     private boolean roll;
     private int coinsAmount;
-    private String coinsStr;
     //List<String> traderList = new ArrayList<String>();
     private boolean declined;
     
@@ -188,7 +192,7 @@ void sendMessage(String message) {
                 getWalking().walk(cwCenterTile);
             }
                if (!modNearby()) {
-                sendMessage("glow2:shake:"+"Verified host | " + "100k min | " + " Roll " + Constants.chance_amount + "+ " + " | " + "("+getLocalPlayer().getName()+")" + " | " + Constants.getCurrentTimeString());
+                sendMessage("glow2:shake:"+"Verified host | " + "100k min | " + " Roll " + Constants.chance_amount + "+ " + " | " + "("+getLocalPlayer().getName()+")" + " | " + "@ "+Constants.getCurrentTimeString());
                 sleep(Calculations.random(1300, 1700));
                }
                 break;
@@ -215,6 +219,7 @@ void sendMessage(String message) {
                          sendMessage("red:Minimum bet amount = 100k");
                          getTrade().declineTrade();
                          trader = null;
+                         tradeTimer.reset();
                         }
                     }
                 }
@@ -241,8 +246,6 @@ void sendMessage(String message) {
                          * Trade screen 2
                         */
                       if (getTrade().isOpen(2)) {
-                          coinsStr = getWidgets().getWidgetChild(334,29,0).getText().replace("Coins<col=ffffff> x <col=ffffff>", "").substring(0, 4);
-                          log("String Coins : " + coinsStr);
                             if (getTrade().acceptTrade(2)) {  
                             sleepUntil(() -> !getTrade().isOpen(), 5000);
                         }}
@@ -250,7 +253,19 @@ void sendMessage(String message) {
                        * Roll dice?
                       */
                         if (!declined && !getTrade().isOpen()) {
-                       getKeyboard().type("green:shake:"+trader + " has placed a bet of " + "("+getCoinsAmountStr()+")" + " | " + Constants.getCurrentTimeString());
+                       getKeyboard().type("green:shake:"+trader + " has placed a bet of " + "("+getCoinsAmountStr()+")" + " @ " + Constants.getCurrentTimeString());
+                       /* 
+                       * File Writer to log trades @TODO
+                       */
+                           /* try {
+                                BufferedWriter Writer = new BufferedWriter(new FileWriter("/home/t7emon/Desktop/Trades.txt"));
+                               Writer.write(trader + " has placed a bet of " + "("+getCoinsAmountStr()+")" + " | " + Constants.getCurrentTimeString() + "\n");
+                               Writer.flush();
+                               Writer.close();
+                            } catch (IOException ex) {
+                                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                            }*/
+                            ////
                          roll = true;
                         sleep(Calculations.random(1000, 1200));
                         }}}}
@@ -259,29 +274,28 @@ void sendMessage(String message) {
                 
                 case ROLL:
                 log("State = Roll");
-                sendMessage("Rolling...");
+                sendMessage("Rolling..." + " @ " + Constants.getCurrentTimeString());
                 sleep(Calculations.random(1000, 1200));
                 random = new Random().nextInt(100);
                 log("Rolled : " + random);
+                if (random == Constants.chance_amount) {
+                     random = new Random().nextInt(100);
+                }
                 if (random < Constants.chance_amount) {
-                  sendMessage("red:shake:"+trader + " has LOST with a roll of ("+random+")");
+                  sendMessage("red:shake:"+trader + " has LOST with a roll of ("+random+")" + " @ " + Constants.getCurrentTimeString());
                   sleep(Calculations.random(1000, 1200));
                     payout = false;
                     roll = false;
                     trader = null;
-                } else {
-                    if (random == Constants.chance_amount) {
-                     random = new Random().nextInt(100);
                     } else {
                         if (random > Constants.chance_amount) {
-                           sendMessage("green:shake:"+trader + " has WON with a roll of ("+random+")");
+                           sendMessage("green:shake:"+trader + " has WON with a roll of ("+random+")" + " @ " + Constants.getCurrentTimeString());
                             this.coinsAmount = coinsAmount * 2;
                             sleep(Calculations.random(1000, 1200));
                             payout = true;
                             roll = false;
                         }
                     }
-                }
                 break;
                 
                 case PAY:
@@ -300,7 +314,7 @@ void sendMessage(String message) {
                         sleepUntil(() -> getTrade().isOpen(2), 5000);
                         if (getTrade().isOpen(2)) {
                             getTrade().acceptTrade(2);
-                            sendMessage("green:"+trader + " has been paid " + "("+getCoinsAmountStr()+")" + " | " + Constants.getCurrentTimeString());
+                            sendMessage("green:"+trader + " has been paid " + "("+getCoinsAmountStr()+")" + " @ " + Constants.getCurrentTimeString());
                             payout = false;
                             trader = null;
                         }}}

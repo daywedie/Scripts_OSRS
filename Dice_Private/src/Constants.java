@@ -33,7 +33,7 @@ public class Constants {
 	    }
            public static Area Castle_wars_lobby = new Area(2446, 3082, 2438, 3097, 0);
            
-           public static String[] moderators = {"tunnellord", "ljfdfd", "gdgrfdf"};
+           public static String[] moderators = {"tunnellord", "gfjdfdvd", "gdgrffdf"};
            
          /*public static void sendMessage(final String message) {
         Canvas canvas = getClient().getInstance().getCanvas();

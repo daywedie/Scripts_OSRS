@@ -1,19 +1,8 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.bot;
-
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import org.dreambot.api.methods.map.Area;
-import org.dreambot.api.utilities.Timer;
 
 /**
  *
- * @author t7emon
+ * @author T7emon, Tear x, Null x, T7x
  */
 public class Constants {
 

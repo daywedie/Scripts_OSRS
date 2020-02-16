@@ -1,24 +1,11 @@
 package com.bot;
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/**
- *
- * @author t7emon
- */
+import com.bot.utils.ImageUtils;
 import java.awt.Color;
 import java.awt.Graphics;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.Random;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.dreambot.api.methods.Calculations;
 import static org.dreambot.api.methods.MethodProvider.log;
 import static org.dreambot.api.methods.MethodProvider.sleep;
@@ -56,6 +43,9 @@ public class Main extends AbstractScript implements InventoryListener {
     private int random;
     private Bot bot;
     private Constants Settings;
+    private int tradeCount = 0;
+    private int rollCount = 0;
+    public BufferedImage backgroundImage = ImageUtils.getImage("https://i.pinimg.com/originals/d5/45/17/d5451747b53b00feb99e2bcc2bbb7ec7.png");
 
   /*
   * Start
@@ -86,6 +76,7 @@ public class Main extends AbstractScript implements InventoryListener {
             log("Trader Detected : " + msg.getUsername() + " @"+bot.getCurrentTimeString());
             if (bot.trader() == null) {
            bot.setTrader(msg.getUsername());
+           tradeCount++;
             }
         }
         if (msg.getMessage().contains("Other player declined trade.")) {
@@ -166,8 +157,8 @@ void sendMessage(String message) {
         * Inventory item changed to verify coins from trader in inventory
         */
         @Override
-    public void onItemChange(Item[] arg0) {
-        for (Item item : arg0) {
+    public void onItemChange(Item[] Items) {
+        for (Item item : Items) {
             //log(item.getName() + " : " + item.getAmount());
             if (item.getName().toLowerCase().equals("coins") && item.getAmount() == bot.coinsAmount()) {
                 bot.setverifiedTrade(true);
@@ -215,11 +206,17 @@ void sendMessage(String message) {
             if (getLocalPlayer().getTile().distance(Locations.CenterTile) >= 5 || !inArea(Locations.Areas.castleWarsArea.area())) {
                 getWalking().walk(Locations.CenterTile);
             }
-            
              /*
              * Trade
             */
-            Player player = getPlayers().closest(Player -> Player.getName().equals(bot.trader()));
+             /*if (getTrade().isOpen() && bot.trader() == null) {
+                 WidgetChild w = getWidgets().getWidgetChild(335, 31);
+                 String trader = w.getText().replace("Trading With: ", "");
+                 log("trading with = " + trader);
+                 bot.setTrader(trader);
+                 sleepUntil(() -> bot.trader() != null, 3000);
+             }*/
+                   Player player = getPlayers().closest(Player -> Player.getName().equals(bot.trader()));
                    if (bot.trader() != null 
                    && !bot.roll() 
                    && !bot.payout() 
@@ -227,7 +224,6 @@ void sendMessage(String message) {
                    && inArea(Locations.Areas.castleWarsArea.castleWarsArea.area()) || getTrade().isOpen()) {            
             return State.TRADE;
            }
-                   
                    
                 
          /*
@@ -281,8 +277,8 @@ void sendMessage(String message) {
              if (getTrade().isOpen() && inTradeTimer == null) {
                inTradeTimer = new Timer();
              }
-             /*
-             * Stop inTradeTimer
+              /*
+              * Stop inTradeTimer
              */
              if (!getTrade().isOpen()) {
                  if (inTradeTimer != null) {
@@ -325,7 +321,7 @@ void sendMessage(String message) {
                 */
                 if(traderAcceptedTrade() && traderItems == null || tradeModified()) {
                     sleep(500);
-                     sendMessage("red:Minimum bet amount : " + Settings.minBetAmountStr());
+                     sendMessage("red:Minimum bet amount: " + Settings.minBetAmountStr() + " | " + "valuta: Coins");
                        getTrade().declineTrade();
                        sleepUntil(() -> !getTrade().isOpen(), 5000);
                        bot.setTrader(null);
@@ -349,7 +345,7 @@ void sendMessage(String message) {
                                 * Decline second trade screen
                                 */
                             if (!coinsInSecondTradeScreen()) {
-                              sendMessage("red:Minimum bet amount : " + Settings.minBetAmountStr());
+                              sendMessage("red:Minimum bet amount: " + Settings.minBetAmountStr() + " | " + "valuta: Coins");
                                  getTrade().declineTrade();
                        sleepUntil(() -> !getTrade().isOpen(), 5000);
                        bot.setTrader(null);
@@ -364,13 +360,21 @@ void sendMessage(String message) {
                               if (traderAcceptedTrade()) {
                                 getTrade().acceptTrade(2);
                                 sleepUntil(() -> !getTrade().isOpen() && bot.verifiedTrade(), 5000);
-                                if (!getTrade().isOpen() && bot.trader() != null && !bot.declinedTrade() && bot.verifiedTrade()) {
+                                sleep(500);
+                              }
+                                if (!getTrade().isOpen() && bot.trader() != null && bot.verifiedTrade()) {
                                 getKeyboard().type("green:shake:"+bot.trader() + " has placed a bet of " + "("+bot.getCoinsAmountStr()+")" + " @ " + bot.getCurrentTimeString());
                                 bot.setRoll(true);
                                 bot.setverifiedTrade(false);
                                sleep(1000);
-                     }
-                         }}}}
+                         } else {
+                       log("Something went wrong!");
+                       getTrade().declineTrade();
+                       bot.setTrader(null);
+                       bot.setRoll(false);
+                                }
+                              }}
+                }
                             }}
                 break;
                 
@@ -381,6 +385,7 @@ void sendMessage(String message) {
                 sleep(Calculations.random(900, 1000));
                 random = new Random().nextInt(100);
                 log("Rolled : " + random);
+                rollCount++;
                 if (random == Settings.chanceAmount()) {
                      random = new Random().nextInt(100);
                 }
@@ -470,8 +475,22 @@ void sendMessage(String message) {
         
 @Override
 	public void onPaint(Graphics g){
-            g.setColor(Color.cyan);
-			g.drawString("Runtime: " + scriptTimer.formatTime(), 10, 35);
+            g.setColor(Color.WHITE);
+                      //g.drawImage(backgroundImage, 10, 50, null);
+                       
+			g.drawString("Runtime: " + scriptTimer.formatTime(), 10, 25);
+                        g.drawString("State: " + getState(), 10, 45);
+                        
+                        g.drawString("Roll: " + Settings.chanceAmount() + " x2", 10, 65);
+                        g.drawString("HotRollEnabled: " + Settings.hotRollEnabled(), 10, 80);
+                        g.drawString("HotRollNumber: " + "("+Settings.hotRollNumber()+")", 10, 95);
+                        g.drawString("MinimumBetAmount: " + Settings.minBetAmountStr(), 10, 110);
+                        
+                        g.drawString("TradeCount: " + tradeCount, 10, 130);
+                        g.drawString("RollCount: " + rollCount, 10, 145);
+                        
+                       // g.drawString("Profit: " + getInventory().count(filter), 10, 120);
+                        g.drawString("CurrentTrader: " + bot.trader(), 10, 160);
                         //g.drawString("Games exp (p/h): " + getSkillTracker().getGainedExperience(Skill.FISHING) + "(" + getSkillTracker().getGainedExperiencePerHour(Skill.FISHING) + ")", 10, 65); //65
                                             
                        

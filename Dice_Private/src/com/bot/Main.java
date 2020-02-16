@@ -6,6 +6,8 @@ import com.bot.utils.ImageUtils;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import org.dreambot.api.methods.Calculations;
@@ -49,7 +51,7 @@ public class Main extends AbstractScript implements InventoryListener {
     private int rollCount = 0;
     private int profitMade;
     public BufferedImage backgroundImage = ImageUtils.getImage("https://i.pinimg.com/originals/d5/45/17/d5451747b53b00feb99e2bcc2bbb7ec7.png");
-
+    List<String> traderQueList = new ArrayList<String>();
   /*
   * Start
  */
@@ -77,15 +79,20 @@ public class Main extends AbstractScript implements InventoryListener {
         public void onMessage(Message msg) {
        if (msg.getMessage().contains("wishes to trade with you.")) {
             log("Trader Detected : " + msg.getUsername() + " @"+bot.getCurrentTimeString());
-            if (bot.trader() == null) {
-           bot.setTrader(msg.getUsername());
-           tradeCount++;
-            }
+           int maxSize = 3;
+           if (traderQueList.size() <= maxSize && !traderQueList.contains(msg.getUsername())) {
+           traderQueList.add(msg.getUsername());
+           log("tradeList : " + traderQueList);
+            } else {
+            log("Trade Que got " + "("+traderQueList.size()+")" + " traders");
+           //sendMessage("red:Trade Que already got (2) traders, please wait.");
+          }
         }
         if (msg.getMessage().contains("Other player declined trade.")) {
             log(bot.trader()+": " + "Declined trade " + "@"+bot.getCurrentTimeString());
             bot.setRoll(false);
             bot.setDeclinedTrade(true);
+            traderQueList.remove(bot.trader());
             bot.setTrader(null);
             inTradeTimer.reset();
         }}
@@ -212,25 +219,36 @@ void sendMessage(String message) {
             }
             
              /*
-             * Trade
+             * Trade que Iteration, Set trader
             */
-             /*if (getTrade().isOpen() && bot.trader() == null) {
-                 WidgetChild w = getWidgets().getWidgetChild(335, 31);
-                 String trader = w.getText().replace("Trading With: ", "");
-                 log("trading with = " + trader);
-                 bot.setTrader(trader);
-                 sleepUntil(() -> bot.trader() != null, 3000);
-             }*/
+            if (bot.trader() == null)
+           for (String trader : traderQueList) {
+               bot.setTrader(trader);
+           }       
+                   /*
+                   * Trade
+                  */
+                   if (bot.trader() != null && traderQueList.contains(bot.trader())) {
                    Player player = getPlayers().closest(Player -> Player.getName().equals(bot.trader()));
-                   if (bot.trader() != null 
-                   && !bot.roll() 
+                   if (!bot.roll() 
                    && !bot.payout() 
                    && getLocalPlayer().getTile().distance(player.getTile()) <= 6
                    && Locations.Areas.castleWarsArea.area().contains(player)
                    && inArea(Locations.Areas.castleWarsArea.area()) || getTrade().isOpen()) {            
             return State.TRADE;
-           }
-                   
+          }}
+           /*
+             * Remove trader from que 
+            */    
+             if (getTrade().isOpen()) {
+                 WidgetChild w = getWidgets().getWidgetChild(335, 31);
+                 String trader = w.getText().replace("Trading With: ", "");
+                 log("trading with = " + trader);
+                 if (traderQueList.contains(trader)) {
+                 traderQueList.remove(trader);
+                 bot.setTrader(trader);
+                 sleepUntil(() -> !traderQueList.contains(trader), 3000);
+             }}        
          /*
          * Roll
        */
@@ -296,6 +314,7 @@ void sendMessage(String message) {
                 getTrade().declineTrade();
                 sendMessage("red:shake:" + bot.trader() + " took too long.. declined trade...");
                 log(bot.trader() + " took too long..");
+                traderQueList.remove(bot.trader());
                 bot.setTrader(null);
                 inTradeTimer.reset();
                 } else {
@@ -303,6 +322,7 @@ void sendMessage(String message) {
                     getTrade().declineTrade();
                     sendMessage("red:shake:" + bot.trader() + " took too long.. declined trade...");
                     log(bot.trader() + " took too long..");
+                    traderQueList.remove(bot.trader());
                    bot.setTrader(null);
                    inTradeTimer.reset();
                     }
@@ -313,8 +333,12 @@ void sendMessage(String message) {
                 */
                 if (!getTrade().isOpen() && bot.trader() != null && !bot.roll() && !bot.payout()) {
                getTrade().tradeWithPlayer(bot.trader());
-               sleepUntil(() -> getTrade().isOpen(1), 5000);
-               }
+               sleepUntil(() -> getTrade().isOpen(1), 10000);
+               tradeCount++;
+               if (!getTrade().isOpen()) {
+                 traderQueList.remove(bot.trader());
+                   bot.setTrader(null);
+                }}
                 
                 /*
                 * First trade screen
@@ -329,6 +353,7 @@ void sendMessage(String message) {
                       sendMessage("flash2:shake:This GAME only accepts Coins: " + "("+Settings.minBetAmountStr() + " to " + Settings.maxBetAmountStr()+")");
                        getTrade().declineTrade();
                        sleepUntil(() -> !getTrade().isOpen(), 5000);
+                       traderQueList.remove(bot.trader());
                        bot.setTrader(null);
                 }
                 /*
@@ -356,6 +381,7 @@ void sendMessage(String message) {
                                 sendMessage("flash2:shake:This GAME only accepts Coins: " + "("+Settings.minBetAmountStr() + " to " + Settings.maxBetAmountStr()+")");
                                  getTrade().declineTrade();
                        sleepUntil(() -> !getTrade().isOpen(), 5000);
+                       traderQueList.remove(bot.trader());
                        bot.setTrader(null);
                         }
                             /*
@@ -401,6 +427,7 @@ void sendMessage(String message) {
                   sleep(Calculations.random(900, 1000));
                     bot.setPayout(false);
                     bot.setRoll(false);
+                    traderQueList.remove(bot.trader());
                     bot.setTrader(null);
                     } else {
                         if (random > Settings.chanceAmount()) {
@@ -427,6 +454,7 @@ void sendMessage(String message) {
                    if (payoutTimer.elapsed() >= 30000) {
                         sendMessage("red:"+bot.trader() + " Didn't accept payout.");
                         bot.setPayout(false);
+                        traderQueList.remove(bot.trader());
                         bot.setTrader(null);
                         payoutTimer.reset();
                     }
@@ -451,7 +479,6 @@ void sendMessage(String message) {
                 if (traderAcceptedTrade()) {
                         getTrade().acceptTrade(1);
                         sleepUntil(() -> getTrade().isOpen(2), 5000);
-                        profitMade -= bot.coinsAmount();
                         /*
                         * Second trade screen
                         */
@@ -468,7 +495,9 @@ void sendMessage(String message) {
                             getTabs().open(Tab.EMOTES);
                             getEmotes().doEmote(Emote.BOW);
                             getTabs().open(Tab.INVENTORY);
+                            profitMade -= bot.coinsAmount();
                             bot.setPayout(false);
+                            traderQueList.remove(bot.trader());
                             bot.setTrader(null);
                             payoutTimer.reset(); 
                              }

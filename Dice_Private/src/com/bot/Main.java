@@ -6,9 +6,9 @@ import com.bot.utils.ImageUtils;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.Random;
 import org.dreambot.api.methods.Calculations;
 import static org.dreambot.api.methods.MethodProvider.log;
@@ -49,9 +49,12 @@ public class Main extends AbstractScript implements InventoryListener {
     private Constants Settings;
     private int tradeCount = 0;
     private int rollCount = 0;
-    private int profitMade;
+    private int profitMade = 0;
+    private int paidOut = 0;
     public BufferedImage backgroundImage = ImageUtils.getImage("https://i.pinimg.com/originals/d5/45/17/d5451747b53b00feb99e2bcc2bbb7ec7.png");
-    List<String> traderQueList = new ArrayList<String>();
+    Queue<String> traderQueue = new LinkedList<>(); 
+    //List<String> payouList = new ArrayList<String>();
+
   /*
   * Start
  */
@@ -80,11 +83,11 @@ public class Main extends AbstractScript implements InventoryListener {
        if (msg.getMessage().contains("wishes to trade with you.")) {
             log("Trader Detected : " + msg.getUsername() + " @"+bot.getCurrentTimeString());
            int maxSize = 3;
-           if (traderQueList.size() <= maxSize && !traderQueList.contains(msg.getUsername())) {
-           traderQueList.add(msg.getUsername());
-           log("tradeList : " + traderQueList);
+           if (traderQueue.size() <= maxSize && !traderQueue.contains(msg.getUsername())) {
+           traderQueue.add(msg.getUsername());
+           log("tradeList : " + traderQueue);
             } else {
-            log("Trade Que got " + "("+traderQueList.size()+")" + " traders");
+            log("Trade Que got " + "("+traderQueue.size()+")" + " traders");
            //sendMessage("red:Trade Que already got (2) traders, please wait.");
           }
         }
@@ -92,7 +95,7 @@ public class Main extends AbstractScript implements InventoryListener {
             log(bot.trader()+": " + "Declined trade " + "@"+bot.getCurrentTimeString());
             bot.setRoll(false);
             bot.setDeclinedTrade(true);
-            traderQueList.remove(bot.trader());
+            traderQueue.remove(bot.trader());
             bot.setTrader(null);
             inTradeTimer.reset();
         }}
@@ -221,17 +224,23 @@ void sendMessage(String message) {
                 getWalking().walk(Locations.CenterTile);
             }
             
+           /*
+           * Advertise
+          */
+           if (bot.trader() == null && traderQueue.isEmpty() && !bot.roll() && !bot.payout()) {
+               return State.ADVERTISE;
+           }
              /*
-             * Trade que Iteration, Set trader
+             * traderQueue Iteration & Set trader
             */
-            if (bot.trader() == null)
-           for (String trader : traderQueList) {
-               bot.setTrader(trader);
-           }       
+            if (bot.trader() == null) {
+           for (String trader : traderQueue) {
+               bot.setTrader(trader); 
+           }}
                    /*
                    * Trade
                   */
-                   if (bot.trader() != null && traderQueList.contains(bot.trader())) {
+                   if (bot.trader() != null && traderQueue.contains(bot.trader())) {
                    Player player = getPlayers().closest(Player -> Player.getName().equals(bot.trader()));
                    if (!bot.roll() 
                    && !bot.payout() 
@@ -241,16 +250,16 @@ void sendMessage(String message) {
             return State.TRADE;
           }}
            /*
-             * Remove trader from que 
+             * Remove trader from traderQueue
             */    
              if (getTrade().isOpen()) {
                  WidgetChild w = getWidgets().getWidgetChild(335, 31);
                  String trader = w.getText().replace("Trading With: ", "");
                  log("trading with = " + trader);
-                 if (traderQueList.contains(trader)) {
-                 traderQueList.remove(trader);
+                 if (traderQueue.contains(trader)) {
+                 traderQueue.remove(trader);
                  bot.setTrader(trader);
-                 sleepUntil(() -> !traderQueList.contains(trader), 3000);
+                 sleepUntil(() -> !traderQueue.contains(trader), 3000);
              }}        
          /*
          * Roll
@@ -265,12 +274,6 @@ void sendMessage(String message) {
           if (bot.payout()) {
               return State.PAY;
           }
-           /*
-           * Advertise
-          */
-           if (bot.trader() == null && !bot.roll() && !bot.payout()) {
-               return State.ADVERTISE;
-           }
            /*
            * Sleep
            */
@@ -317,7 +320,7 @@ void sendMessage(String message) {
                 getTrade().declineTrade();
                 sendMessage("red:shake:" + bot.trader() + " took too long.. declined trade...");
                 log(bot.trader() + " took too long..");
-                traderQueList.remove(bot.trader());
+                traderQueue.remove(bot.trader());
                 bot.setTrader(null);
                 inTradeTimer.reset();
                 } else {
@@ -325,7 +328,7 @@ void sendMessage(String message) {
                     getTrade().declineTrade();
                     sendMessage("red:shake:" + bot.trader() + " took too long.. declined trade...");
                     log(bot.trader() + " took too long..");
-                    traderQueList.remove(bot.trader());
+                    traderQueue.remove(bot.trader());
                    bot.setTrader(null);
                    inTradeTimer.reset();
                     }
@@ -340,7 +343,7 @@ void sendMessage(String message) {
                sleepUntil(() -> getTrade().isOpen(1), 10000);
                tradeCount++;
                if (!getTrade().isOpen()) {
-                 traderQueList.remove(bot.trader());
+                 traderQueue.remove(bot.trader());
                    bot.setTrader(null);
                 }}
                 
@@ -371,7 +374,7 @@ void sendMessage(String message) {
                       sendMessage("flash2:shake:This GAME only accepts Coins: " + "("+Settings.minBetAmountStr() + " to " + Settings.maxBetAmountStr()+")");
                        getTrade().declineTrade();
                        sleepUntil(() -> !getTrade().isOpen(), 5000);
-                       traderQueList.remove(bot.trader());
+                       traderQueue.remove(bot.trader());
                        bot.setTrader(null);
                     }}}}}
                             /*
@@ -405,7 +408,7 @@ void sendMessage(String message) {
                                 sendMessage("flash2:shake:This GAME only accepts Coins: " + "("+Settings.minBetAmountStr() + " to " + Settings.maxBetAmountStr()+")");
                                  getTrade().declineTrade();
                        sleepUntil(() -> !getTrade().isOpen(), 5000);
-                       traderQueList.remove(bot.trader());
+                       traderQueue.remove(bot.trader());
                        bot.setTrader(null);
                             }}}}
                 break;
@@ -426,7 +429,7 @@ void sendMessage(String message) {
                   sleep(Calculations.random(900, 1000));
                     bot.setPayout(false);
                     bot.setRoll(false);
-                    traderQueList.remove(bot.trader());
+                    traderQueue.remove(bot.trader());
                     bot.setTrader(null);
                     } else {
                         if (random > Settings.chanceAmount()) {
@@ -453,7 +456,7 @@ void sendMessage(String message) {
                    if (payoutTimer.elapsed() >= 30000) {
                         sendMessage("red:"+bot.trader() + " Didn't accept payout.");
                         bot.setPayout(false);
-                        traderQueList.remove(bot.trader());
+                        traderQueue.remove(bot.trader());
                         bot.setTrader(null);
                         payoutTimer.reset();
                     }
@@ -495,8 +498,9 @@ void sendMessage(String message) {
                             getEmotes().doEmote(Emote.BOW);
                             getTabs().open(Tab.INVENTORY);
                             profitMade -= bot.coinsAmount();
+                            paidOut = bot.coinsAmount();
                             bot.setPayout(false);
-                            traderQueList.remove(bot.trader());
+                            traderQueue.remove(bot.trader());
                             bot.setTrader(null);
                             payoutTimer.reset(); 
                              }
@@ -513,21 +517,18 @@ void sendMessage(String message) {
             g.setColor(Color.WHITE);
                       //g.drawImage(backgroundImage, 10, 50, null);
                        
-			g.drawString("Runtime: " + scriptTimer.formatTime(), 10, 25);
-                        g.drawString("State: " + getState(), 10, 45);
+			g.drawString("Runtime: " + scriptTimer.formatTime(), 10, 35);
+                        g.drawString("State: " + getState(), 10, 50);
                         
-                        g.drawString("Roll: " + Settings.chanceAmount() + " x2", 10, 65);
-                        g.drawString("HotRollEnabled: " + Settings.hotRollEnabled(), 10, 80);
-                        g.drawString("HotRollNumber: " + "("+Settings.hotRollNumber()+")", 10, 95);
-                        g.drawString("MinimumBetAmount: " + Settings.minBetAmountStr(), 10, 110);
+                        g.drawString("Roll: " + "("+Settings.chanceAmount()+")" + " x2", 10, 80);
+                        g.drawString("HotRollEnabled: " + "("+Settings.hotRollEnabled()+")", 10, 95);
+                        g.drawString("HotRollNumber: " + "("+Settings.hotRollNumber()+")" + " x3", 10, 110);
+                        g.drawString("MinimumBetAmount: " + "("+Settings.minBetAmountStr()+")", 10, 125);
                         
-                        g.drawString("TradeCount: " + tradeCount, 10, 130);
-                        g.drawString("RollCount: " + rollCount, 10, 145);
-                        g.drawString("Profit: " + profitMade / 1000 + "K" , 10, 160);           
-                        
-                        g.drawString("CurrentTrader: " + bot.trader(), 10, 175);           
-                                            
-                       
+                        g.drawString("TradeCount: " + "("+tradeCount+")", 10, 145);
+                        g.drawString("RollCount: " + "("+rollCount+")", 10, 160);
+                        g.drawString("Profit: " + "("+profitMade / 1000 + "K"+")", 10, 175);           
+                        g.drawString("Paid: " + "("+paidOut / 1000 + "K"+")", 10, 190);            
 }
 }
 

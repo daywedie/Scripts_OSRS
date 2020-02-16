@@ -74,9 +74,9 @@ public class JFrame extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(locationComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(locationLabel))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 38, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 85, Short.MAX_VALUE)
                 .addComponent(startButton, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(70, 70, 70))
+                .addGap(23, 23, 23))
         );
 
         pack();
@@ -91,7 +91,7 @@ public class JFrame extends javax.swing.JFrame {
             //@TODO GRANDEXCHANGE LOCATION
         }
         if (locationComboBox.getSelectedItem().equals("CastleWars")) {
-            
+            //@TODO CASTLEWARS LOCATION
         }
     }//GEN-LAST:event_startButtonActionPerformed
 

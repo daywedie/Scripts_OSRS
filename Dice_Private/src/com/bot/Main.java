@@ -102,7 +102,7 @@ public class Main extends AbstractScript implements InventoryListener {
   */      
 void sendMessage(String message) {
     if (!modNearby()) {
-     getMouse().getMouseSettings().setWordsPerMinute(400);
+     getMouse().getMouseSettings().setWordsPerMinute(600);
      getKeyboard().type(message);
 }}
 
@@ -137,15 +137,17 @@ void sendMessage(String message) {
    * Check if trade has been modified
    */
    private boolean tradeModified() {
+       if (!getTrade().isOpen()) {
+           return false;
+       }
+       WidgetChild w = null;
     if (getTrade().isOpen(1)) {
-                WidgetChild w = getWidgets().getWidgetChild(335,29);
-                    if (w != null){
-                        if (w.getText().toLowerCase().contains("modified")) {
-                       return true;
-                        }
-                    }}
-          return false;
-}
+             w = getWidgets().getWidgetChild(335, 29);
+                        } else {
+                    w = getWidgets().getWidgetChild(334, 31);
+                       }
+    return w != null && w.isVisible() && w.getText().toLowerCase().contains("modified");
+   }
    
      /*
      * Check for coins in second trade screen
@@ -169,8 +171,9 @@ void sendMessage(String message) {
         @Override
     public void onItemChange(Item[] Items) {
         for (Item item : Items) {
-            if (item.getName().toLowerCase().equals("coins") && item.getAmount() == bot.coinsAmount()) {
+            if (item.getName().toLowerCase().equals("coins") && item.getAmount() >= Settings.minBetAmount()) {
                log(item.getName() + " : " + item.getAmount());
+                bot.setCoinsAmount(item.getAmount());
                 bot.setverifiedTrade(true);
                 profitMade += item.getAmount();
             }
@@ -182,10 +185,10 @@ void sendMessage(String message) {
     private boolean modNearby() {
         //String[] moderators = {"tunnellord", "ljfdfd", "gdgrfdf"};
            List<Player> playerList = getPlayers().all();
-           for (Player player : playerList) {
            for (String modName : Settings.moderators()) {
+           for (Player player : playerList) {
                if (player.getName().toLowerCase().contains(modName)) {
-                   log("WARNING: Moderator : " + modName + " nearby");
+                   log("WARNING: Moderator : " + "("+modName+")");
                    return true;
                }
            }}
@@ -310,7 +313,7 @@ void sendMessage(String message) {
                 /*
                 * Decline trade after tradeTimer elapsed..
                */
-                if (getTrade().isOpen(1) && inTradeTimer.elapsed() >= 15000) {
+                if (getTrade().isOpen(1) && inTradeTimer.elapsed() >= 20000) {
                 getTrade().declineTrade();
                 sendMessage("red:shake:" + bot.trader() + " took too long.. declined trade...");
                 log(bot.trader() + " took too long..");
@@ -318,7 +321,7 @@ void sendMessage(String message) {
                 bot.setTrader(null);
                 inTradeTimer.reset();
                 } else {
-                    if (getTrade().isOpen(2) && inTradeTimer.elapsed() >= 15000) {
+                    if (getTrade().isOpen(2) && inTradeTimer.elapsed() >= 20000) {
                     getTrade().declineTrade();
                     sendMessage("red:shake:" + bot.trader() + " took too long.. declined trade...");
                     log(bot.trader() + " took too long..");
@@ -327,6 +330,7 @@ void sendMessage(String message) {
                    inTradeTimer.reset();
                     }
                }
+                        
                 
                  /*
                  * Trade with player
@@ -345,70 +349,65 @@ void sendMessage(String message) {
                */
                if (getTrade().isOpen(1)) {
                 Item[] traderItems = getTrade().getTheirItems();
-                /*
-                * Decline first screen trade
-                */
-                if(traderAcceptedTrade() && traderItems == null || tradeModified()) {
-                    sleep(500);
-                      sendMessage("flash2:shake:This GAME only accepts Coins: " + "("+Settings.minBetAmountStr() + " to " + Settings.maxBetAmountStr()+")");
-                       getTrade().declineTrade();
-                       sleepUntil(() -> !getTrade().isOpen(), 5000);
-                       traderQueList.remove(bot.trader());
-                       bot.setTrader(null);
-                }
+                sleepUntil(() -> traderItems != null, 1000);
                 /*
                 * Accept first screen trade
                 */
                 if (traderItems != null) {
-                for (Item item : traderItems) {
-                    sleepUntil(() -> traderAcceptedTrade(), 10000);
+                    for (Item item : traderItems) {
+                    sleepUntil(() -> traderAcceptedTrade(), 1000);
                     if (traderAcceptedTrade() 
                      && item.getName().toLowerCase().equals("coins") 
                      && item.getAmount() >= Settings.minBetAmount() 
                      && item.getAmount() <= Settings.maxBetAmount()) {
                        getTrade().acceptTrade(1);
                        sleepUntil(() -> getTrade().isOpen(2), 5000);
-                       bot.setCoinsAmount(item.getAmount());
-                      }
+                      } else {
+                 /*
+                * Decline first screen trade
+                        
+                */    sleepUntil(() -> traderAcceptedTrade(), 1000);
+                        if (traderAcceptedTrade()) {
+                      sendMessage("flash2:shake:This GAME only accepts Coins: " + "("+Settings.minBetAmountStr() + " to " + Settings.maxBetAmountStr()+")");
+                       getTrade().declineTrade();
+                       sleepUntil(() -> !getTrade().isOpen(), 5000);
+                       traderQueList.remove(bot.trader());
+                       bot.setTrader(null);
+                    }}}}}
                             /*
                             * Second trade screen
                             */
                             if (getTrade().isOpen(2)) {
-                                /*
-                                * Decline second trade screen
-                                */
-                            if (!coinsInSecondTradeScreen()) {
-                                sendMessage("flash2:shake:This GAME only accepts Coins: " + "("+Settings.minBetAmountStr() + " to " + Settings.maxBetAmountStr()+")");
-                                 getTrade().declineTrade();
-                       sleepUntil(() -> !getTrade().isOpen(), 5000);
-                       traderQueList.remove(bot.trader());
-                       bot.setTrader(null);
-                        }
-                            /*
+                            sleepUntil(() -> coinsInSecondTradeScreen(), 1000);
+                             /*
                             * Accept second trade screen
                             */
-                            sleepUntil(() -> coinsInSecondTradeScreen(), 5000);
                               if (coinsInSecondTradeScreen()) {
                               sleepUntil(() -> traderAcceptedTrade(), 10000);
                               if (traderAcceptedTrade()) {
                                 getTrade().acceptTrade(2);
                                 sleepUntil(() -> !getTrade().isOpen() && bot.verifiedTrade(), 5000);
-                                sleep(500);
                               }
+                              /*
+                              * Placed bet succesfully
+                              */
                                 if (!getTrade().isOpen() && bot.trader() != null && bot.verifiedTrade()) {
                                 getKeyboard().type("flash3:"+bot.trader() + " has placed a bet of " + "("+bot.getCoinsAmountStr()+")" + " @ " + bot.getCurrentTimeString());
                                 bot.setRoll(true);
                                 bot.setverifiedTrade(false);
                                sleep(1000);
-                         } else {
-                       log("Something went wrong!");
-                       getTrade().declineTrade();
+                                } else {
+                                /*
+                                * Decline second trade screen
+                                */
+                                sleepUntil(() -> traderAcceptedTrade(), 1000);
+                                if (traderAcceptedTrade()) {
+                                sendMessage("flash2:shake:This GAME only accepts Coins: " + "("+Settings.minBetAmountStr() + " to " + Settings.maxBetAmountStr()+")");
+                                 getTrade().declineTrade();
+                       sleepUntil(() -> !getTrade().isOpen(), 5000);
+                       traderQueList.remove(bot.trader());
                        bot.setTrader(null);
-                       bot.setRoll(false);
-                                }
-                              }}
-                }
-                            }}
+                            }}}}
                 break;
                 
                 

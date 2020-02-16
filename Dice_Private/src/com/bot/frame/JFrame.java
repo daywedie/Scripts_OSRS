@@ -46,6 +46,11 @@ public class JFrame extends javax.swing.JFrame {
         locationLabel.setText("Location:");
 
         startButton.setText("Start");
+        startButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                startButtonActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -80,6 +85,15 @@ public class JFrame extends javax.swing.JFrame {
     private void locationComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_locationComboBoxActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_locationComboBoxActionPerformed
+
+    private void startButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startButtonActionPerformed
+        if (locationComboBox.getSelectedItem().equals("GrandExchange")) {
+            //@TODO GRANDEXCHANGE LOCATION
+        }
+        if (locationComboBox.getSelectedItem().equals("CastleWars")) {
+            
+        }
+    }//GEN-LAST:event_startButtonActionPerformed
 
     /**
      * @param args the command line arguments

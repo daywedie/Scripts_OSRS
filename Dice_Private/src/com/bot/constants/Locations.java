@@ -1,4 +1,4 @@
-package com.bot;
+package com.bot.constants;
 
 import org.dreambot.api.methods.map.Tile;
 import org.dreambot.api.methods.map.Area;
@@ -15,7 +15,7 @@ public class Locations {
     * The area enum
     */
     public enum Areas {
-      castleWarsArea(new Area(2446, 3082, 2438, 3097, 0));
+      castleWarsArea(new Area(2438, 3082, 2446, 3097, 0));
       
       /*
       * area variable

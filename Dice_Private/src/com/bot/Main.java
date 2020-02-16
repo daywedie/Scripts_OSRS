@@ -1,5 +1,7 @@
 package com.bot;
 
+import com.bot.constants.Locations;
+import com.bot.constants.Constants;
 import com.bot.utils.ImageUtils;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -45,6 +47,7 @@ public class Main extends AbstractScript implements InventoryListener {
     private Constants Settings;
     private int tradeCount = 0;
     private int rollCount = 0;
+    private int profitMade;
     public BufferedImage backgroundImage = ImageUtils.getImage("https://i.pinimg.com/originals/d5/45/17/d5451747b53b00feb99e2bcc2bbb7ec7.png");
 
   /*
@@ -159,10 +162,10 @@ void sendMessage(String message) {
         @Override
     public void onItemChange(Item[] Items) {
         for (Item item : Items) {
-            //log(item.getName() + " : " + item.getAmount());
             if (item.getName().toLowerCase().equals("coins") && item.getAmount() == bot.coinsAmount()) {
+               log(item.getName() + " : " + item.getAmount());
                 bot.setverifiedTrade(true);
-                log(item.getName() + " : " + item.getAmount());
+                profitMade += item.getAmount();
             }
         }
     }
@@ -199,13 +202,15 @@ void sendMessage(String message) {
     */           
         private State getState() {
              /*
-             * Move to choosen locaiton..
+             *@TODO
+             * Move to choosen location.. ONLY SUPPORTS CASTLEWARS ATM.
             */
              //Tile CenterTile = new Tile(2441, 3087, 0);
              Locations.CenterTile = Locations.centerTile.castleWarsCenterTile.tile();
-            if (getLocalPlayer().getTile().distance(Locations.CenterTile) >= 5 || !inArea(Locations.Areas.castleWarsArea.area())) {
+            if (getLocalPlayer().getTile().distance(Locations.CenterTile) >= 7 || !inArea(Locations.Areas.castleWarsArea.area())) {
                 getWalking().walk(Locations.CenterTile);
             }
+            
              /*
              * Trade
             */
@@ -220,12 +225,12 @@ void sendMessage(String message) {
                    if (bot.trader() != null 
                    && !bot.roll() 
                    && !bot.payout() 
-                   && getLocalPlayer().getTile().distance(player.getTile()) < 5 
-                   && inArea(Locations.Areas.castleWarsArea.castleWarsArea.area()) || getTrade().isOpen()) {            
+                   && getLocalPlayer().getTile().distance(player.getTile()) <= 6
+                   && Locations.Areas.castleWarsArea.area().contains(player)
+                   && inArea(Locations.Areas.castleWarsArea.area()) || getTrade().isOpen()) {            
             return State.TRADE;
            }
                    
-                
          /*
          * Roll
        */
@@ -321,7 +326,7 @@ void sendMessage(String message) {
                 */
                 if(traderAcceptedTrade() && traderItems == null || tradeModified()) {
                     sleep(500);
-                     sendMessage("red:Minimum bet amount: " + Settings.minBetAmountStr() + " | " + "valuta: Coins");
+                      sendMessage("flash2:shake:This GAME only accepts Coins: " + "("+Settings.minBetAmountStr() + " to " + Settings.maxBetAmountStr()+")");
                        getTrade().declineTrade();
                        sleepUntil(() -> !getTrade().isOpen(), 5000);
                        bot.setTrader(null);
@@ -331,8 +336,11 @@ void sendMessage(String message) {
                 */
                 if (traderItems != null) {
                 for (Item item : traderItems) {
-                    sleepUntil(() -> traderAcceptedTrade(), 5000);
-                    if (traderAcceptedTrade() && item.getName().toLowerCase().equals("coins") && item.getAmount() >= Settings.minBetAmount()) {
+                    sleepUntil(() -> traderAcceptedTrade(), 10000);
+                    if (traderAcceptedTrade() 
+                     && item.getName().toLowerCase().equals("coins") 
+                     && item.getAmount() >= Settings.minBetAmount() 
+                     && item.getAmount() <= Settings.maxBetAmount()) {
                        getTrade().acceptTrade(1);
                        sleepUntil(() -> getTrade().isOpen(2), 5000);
                        bot.setCoinsAmount(item.getAmount());
@@ -345,12 +353,11 @@ void sendMessage(String message) {
                                 * Decline second trade screen
                                 */
                             if (!coinsInSecondTradeScreen()) {
-                              sendMessage("red:Minimum bet amount: " + Settings.minBetAmountStr() + " | " + "valuta: Coins");
+                                sendMessage("flash2:shake:This GAME only accepts Coins: " + "("+Settings.minBetAmountStr() + " to " + Settings.maxBetAmountStr()+")");
                                  getTrade().declineTrade();
                        sleepUntil(() -> !getTrade().isOpen(), 5000);
                        bot.setTrader(null);
-                       log("Something went wrong!");
-                                }
+                        }
                             /*
                             * Accept second trade screen
                             */
@@ -363,7 +370,7 @@ void sendMessage(String message) {
                                 sleep(500);
                               }
                                 if (!getTrade().isOpen() && bot.trader() != null && bot.verifiedTrade()) {
-                                getKeyboard().type("green:shake:"+bot.trader() + " has placed a bet of " + "("+bot.getCoinsAmountStr()+")" + " @ " + bot.getCurrentTimeString());
+                                getKeyboard().type("flash3:"+bot.trader() + " has placed a bet of " + "("+bot.getCoinsAmountStr()+")" + " @ " + bot.getCurrentTimeString());
                                 bot.setRoll(true);
                                 bot.setverifiedTrade(false);
                                sleep(1000);
@@ -381,7 +388,7 @@ void sendMessage(String message) {
                 
                 case ROLL:
                 log("State = Roll");
-                sendMessage("Rolling..." + " @ " + bot.getCurrentTimeString());
+                sendMessage("white:slide:Rolling..." + " @ " + bot.getCurrentTimeString());
                 sleep(Calculations.random(900, 1000));
                 random = new Random().nextInt(100);
                 log("Rolled : " + random);
@@ -397,11 +404,11 @@ void sendMessage(String message) {
                     bot.setTrader(null);
                     } else {
                         if (random > Settings.chanceAmount()) {
-                           sendMessage("green:shake:"+bot.trader() + " has WON with a roll of ("+random+")" + " @ " + bot.getCurrentTimeString());
+                           sendMessage("flash3:"+bot.trader() + " has WON with a roll of ("+random+")" + " @ " + bot.getCurrentTimeString());
                             bot.setCoinsAmount(bot.coinsAmount() * 2);
                             if (random == Settings.hotRollNumber() && Settings.hotRollEnabled()) {
                                 bot.setCoinsAmount(bot.coinsAmount() * 3);
-                                sendMessage("glow2:Congratulations " +bot.trader() + " has rolled the Hot number : " + "("+Settings.hotRollNumber()+")");
+                                sendMessage("flash3:Congratulations " +bot.trader() + " has rolled the Hot number : " + "("+Settings.hotRollNumber()+")");
                             }
                             sleep(Calculations.random(900, 1000));
                             bot.setPayout(true);
@@ -444,7 +451,7 @@ void sendMessage(String message) {
                 if (traderAcceptedTrade()) {
                         getTrade().acceptTrade(1);
                         sleepUntil(() -> getTrade().isOpen(2), 5000);
-                        
+                        profitMade -= bot.coinsAmount();
                         /*
                         * Second trade screen
                         */
@@ -457,7 +464,7 @@ void sendMessage(String message) {
                              * Payout finished
                             */
                              if (!getTrade().isOpen(2)) {
-                            sendMessage("green:"+bot.trader() + " has been paid " + "("+bot.getCoinsAmountStr()+")" + " @ " + bot.getCurrentTimeString());
+                            sendMessage("flash3:"+bot.trader() + " has been paid " + "("+bot.getCoinsAmountStr()+")" + " @ " + bot.getCurrentTimeString());
                             getTabs().open(Tab.EMOTES);
                             getEmotes().doEmote(Emote.BOW);
                             getTabs().open(Tab.INVENTORY);
@@ -488,10 +495,9 @@ void sendMessage(String message) {
                         
                         g.drawString("TradeCount: " + tradeCount, 10, 130);
                         g.drawString("RollCount: " + rollCount, 10, 145);
+                        g.drawString("Profit: " + profitMade / 1000 + "K" , 10, 160);           
                         
-                       // g.drawString("Profit: " + getInventory().count(filter), 10, 120);
-                        g.drawString("CurrentTrader: " + bot.trader(), 10, 160);
-                        //g.drawString("Games exp (p/h): " + getSkillTracker().getGainedExperience(Skill.FISHING) + "(" + getSkillTracker().getGainedExperiencePerHour(Skill.FISHING) + ")", 10, 65); //65
+                        g.drawString("CurrentTrader: " + bot.trader(), 10, 175);           
                                             
                        
 }

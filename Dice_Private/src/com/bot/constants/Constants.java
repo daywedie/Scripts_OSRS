@@ -14,7 +14,7 @@ public class Constants {
          private int chanceAmount = 55; //chance amount for player to win. Above this number is payout x2 
          private boolean hotRollEnabled = true; //Hot Roll enabled true or false
          private int hotRollNumber = 88; //Hot Roll number for payout x3
-         private String[] moderators = {"tunnellord", "shawtyblits", "hiren"}; //Moderators nearby
+         private String[] moderators = {"tunnellord", "shawtyblitz", "shawtyblits", "hiren"}; //Moderators nearby
      
          /*
          * Getters

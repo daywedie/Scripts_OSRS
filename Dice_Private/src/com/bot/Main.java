@@ -227,7 +227,7 @@ void sendMessage(String message) {
            /*
            * Advertise
           */
-           if (bot.trader() == null && traderQueue.isEmpty() && !bot.roll() && !bot.payout()) {
+           if (bot.trader() == null && traderQueue.isEmpty() && !getTrade().isOpen() && !bot.roll() && !bot.payout()) {
                return State.ADVERTISE;
            }
              /*
@@ -248,11 +248,11 @@ void sendMessage(String message) {
                    && Locations.Areas.castleWarsArea.area().contains(player)
                    && inArea(Locations.Areas.castleWarsArea.area()) || getTrade().isOpen()) {            
             return State.TRADE;
-          }}
+            }}
            /*
              * Remove trader from traderQueue
             */    
-             if (getTrade().isOpen()) {
+            if (getTrade().isOpen()) {
                  WidgetChild w = getWidgets().getWidgetChild(335, 31);
                  String trader = w.getText().replace("Trading With: ", "");
                  log("trading with = " + trader);
@@ -260,7 +260,7 @@ void sendMessage(String message) {
                  traderQueue.remove(trader);
                  bot.setTrader(trader);
                  sleepUntil(() -> !traderQueue.contains(trader), 3000);
-             }}        
+             }} 
          /*
          * Roll
        */
@@ -316,7 +316,7 @@ void sendMessage(String message) {
                 /*
                 * Decline trade after tradeTimer elapsed..
                */
-                if (getTrade().isOpen(1) && inTradeTimer.elapsed() >= 20000) {
+                if (getTrade().isOpen(1) && inTradeTimer.elapsed() >= 15000) {
                 getTrade().declineTrade();
                 sendMessage("red:shake:" + bot.trader() + " took too long.. declined trade...");
                 log(bot.trader() + " took too long..");
@@ -324,7 +324,7 @@ void sendMessage(String message) {
                 bot.setTrader(null);
                 inTradeTimer.reset();
                 } else {
-                    if (getTrade().isOpen(2) && inTradeTimer.elapsed() >= 20000) {
+                    if (getTrade().isOpen(2) && inTradeTimer.elapsed() >= 15000) {
                     getTrade().declineTrade();
                     sendMessage("red:shake:" + bot.trader() + " took too long.. declined trade...");
                     log(bot.trader() + " took too long..");

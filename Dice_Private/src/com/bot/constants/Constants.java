@@ -12,10 +12,12 @@ public class Constants {
          private int minBetAmount = 100000; //the minimum bet amount coins 100k
          private int maxBetAmount = 100000000; //the maximum bet amount coins 100M
          private int chanceAmount = 55; //chance amount for player to win. Above this number is payout x2 
+         public int randomInt = 100; //random number 100 for normal, 55 for rigged roll
          private boolean hotRollEnabled = true; //Hot Roll enabled true or false
          private int hotRollNumber = 88; //Hot Roll number for payout x3
          private String[] moderators = {"tunnellord", "shawtyblitz", "shawtyblits", "hiren"}; //Moderators nearby
-     
+            
+         
          /*
          * Getters
        */

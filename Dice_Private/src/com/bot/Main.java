@@ -293,9 +293,12 @@ void sendMessage(String message) {
                if (!getLocalPlayer().getTile().equals(cwCenterTile)) {
                 getWalking().walk(cwCenterTile);
             }
-                sendMessage("glow2:shake:"+"Verified host | " + Settings.minBetAmountStr() + " min | " + " Roll " + Settings.chanceAmount() + "+ " + " | " + "("+getLocalPlayer().getName()+")" + " | " + "@ "+bot.getCurrentTimeString());
-                sendMessage("glow1:shake:"+"Play responsible | " + Settings.minBetAmountStr() + " min | " + " Roll " + Settings.chanceAmount() + "+ " + " | " + "("+getLocalPlayer().getName()+")" + " | " + "@ "+bot.getCurrentTimeString());
-                sendMessage("glow3:shake:"+"HotRoll: " + "("+Settings.hotRollNumber() +")" + " x3 " + "| " + Settings.minBetAmountStr() + " min " + "| " + "("+getLocalPlayer().getName()+")" + " | " + "@ "+bot.getCurrentTimeString());
+                sendMessage("glow2:"+"Verified host | " + Settings.minBetAmountStr() + " min | " + " Roll " + Settings.chanceAmount() + "+ " + " | " + "("+getLocalPlayer().getName()+")" + " | " + "@ "+bot.getCurrentTimeString());
+                sleep(1000);
+                sendMessage("glow1:"+"Play responsible | " + Settings.minBetAmountStr() + " min | " + " Roll " + Settings.chanceAmount() + "+ " + " | " + "("+getLocalPlayer().getName()+")" + " | " + "@ "+bot.getCurrentTimeString());
+                sleep(1000);
+                sendMessage("flash2:"+"HotRoll: " + "("+Settings.hotRollNumber() +")" + " x3 " + "| " + Settings.minBetAmountStr() + " min " + "| " + "("+getLocalPlayer().getName()+")" + " | " + "@ "+bot.getCurrentTimeString());
+                sleep(1000);
                 break;
             
                 case TRADE:
@@ -420,11 +423,11 @@ void sendMessage(String message) {
                 log("State = Roll");
                 //sendMessage("white:slide:Rolling..." + " @ " + bot.getCurrentTimeString());
                // sleep(Calculations.random(700, 777));
-                random = new Random().nextInt(100);
+                random = new Random().nextInt(Settings.randomInt);
                 log("Rolled : " + random);
                 rollCount++;
                 if (random == Settings.chanceAmount()) {
-                     random = new Random().nextInt(100);
+                     random = new Random().nextInt(Settings.randomInt);
                 }
                 if (random < Settings.chanceAmount()) {
                   sendMessage("red:shake:"+bot.trader() + " has LOST with a roll of ("+random+")" + " @ " + bot.getCurrentTimeString());

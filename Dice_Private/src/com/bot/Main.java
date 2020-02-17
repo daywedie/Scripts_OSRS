@@ -250,9 +250,9 @@ void sendMessage(String message) {
             return State.TRADE;
             }}
            /*
-             * Remove trader from traderQueue
+             * Trader
             */    
-            if (getTrade().isOpen()) {
+            /*if (getTrade().isOpen() && bot.trader() == null && traderQueue.isEmpty()) {
                  WidgetChild w = getWidgets().getWidgetChild(335, 31);
                  String trader = w.getText().replace("Trading With: ", "");
                  log("trading with = " + trader);
@@ -260,7 +260,7 @@ void sendMessage(String message) {
                  traderQueue.remove(trader);
                  bot.setTrader(trader);
                  sleepUntil(() -> !traderQueue.contains(trader), 3000);
-             }} 
+             }}*/
          /*
          * Roll
        */
@@ -515,7 +515,7 @@ void sendMessage(String message) {
                 case SLEEP:
                     Calculations.random(77, 177);
             }
-        return Calculations.random(977, 1077);
+        return Calculations.random(1077, 1177);
         }
         
 @Override
